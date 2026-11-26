@@ -107,15 +107,22 @@
 
       /* hissan（わり算の筆算） */
       .hissan { display: flex; justify-content: center; margin: 0 0 2px; }
-      .h-grid { display: grid; gap: 0 3px; font-variant-numeric: tabular-nums; }
+      .h-grid { display: grid; gap: 0 3px; font-variant-numeric: tabular-nums; position: relative; }
       .h-cell { width: var(--cell); height: var(--cell); display: flex; align-items: center; justify-content: center; font-size: calc(var(--cell) * 0.66); font-weight: 800; border-radius: 8px; border: 2px solid #d9e9f4; background: #fff; box-sizing: border-box; }
       .h-cell.sign2 { width: calc(var(--cell) * 1.7); font-size: calc(var(--cell) * 0.54); justify-content: flex-end; padding-right: 6px; color: var(--ink); border-color: transparent; background: transparent; }
       .h-cell.pt { width: calc(var(--cell) * 0.3); font-size: calc(var(--cell) * 0.57); font-weight: 900; border-color: transparent; background: transparent; }
       .h-cell.work { height: calc(var(--cell) * 0.56); font-size: calc(var(--cell) * 0.5); }
       .h-cell.target { background: var(--amber-soft); border: 3px solid var(--amber); color: #b97a0f; animation: pulse 1s infinite; }
-      .h-cell.filled { color: var(--ink); }
+      .h-cell.filled { color: var(--primary-dark); }
       .h-cell.dim { color: #a9c3d6; }
       .h-cell.prefill { color: var(--muted); }
+      /* 筆算の役割の色分け（積・ひいた結果・おろした数字） */
+      .h-cell.prod { color: var(--good); }
+      .h-cell.rem { color: #c75b27; }
+      .h-cell.down { color: #7a5faa; }
+      .h-cell.src-mark { color: #7a5faa; border-color: #b7a6dd; background: #f1ecfa; }
+      .h-cell.down-live { background: #f1ecfa; border-color: #b7a6dd; }
+      .orosu-arrow { position: absolute; left: 0; top: 0; pointer-events: none; }
       .h-line { border-bottom: 3px solid var(--ink); height: 4px; }
       .h-part { border-bottom: 3px solid var(--ink); height: 3px; }
       @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(245,166,35,.45); } 50% { box-shadow: 0 0 0 7px rgba(245,166,35,0); } }
@@ -783,8 +790,8 @@
         var cols = divCols();
         var step = div.steps[cur.stepIdx];
         var tmpl = "calc(var(--cell) * 1.7) " + cols.map(function (c) { return c.t === "p" ? "calc(var(--cell) * 0.3)" : "var(--cell)"; }).join(" ");
-        function cell(content, cls) { return '<span class="h-cell ' + (cls || "") + '">' + (content === "" || content == null ? "&nbsp;" : content) + "</span>"; }
-        function workCell(content, cls) { return '<span class="h-cell work ' + (cls || "") + '">' + (content === "" || content == null ? "&nbsp;" : content) + "</span>"; }
+        function cell(content, cls, attr) { return '<span class="h-cell ' + (cls || "") + '"' + (attr || "") + '>' + (content === "" || content == null ? "&nbsp;" : content) + "</span>"; }
+        function workCell(content, cls, attr) { return '<span class="h-cell work ' + (cls || "") + '"' + (attr || "") + '>' + (content === "" || content == null ? "&nbsp;" : content) + "</span>"; }
         var cellPx = div.steps.length <= 1 ? 64 : (div.steps.length === 2 ? 60 : 48);
         var html = '<div class="hissan-head"><span class="step-label">ステップ2：筆算</span>' + pillsHTML() + '</div>' +
           '<div class="step-prompt">' + div.Dstr + " ÷ " + p.db + ' を 計算しよう</div>' +
@@ -804,13 +811,20 @@
         html += '<div class="h-line" style="grid-column: 1 / -1;"></div>';
         // わられる数の行
         html += '<span class="h-cell sign2">' + p.db + " )</span>";
+        var orosuStep = (cur.reveal && cur.reveal.stage === 2) ? div.steps[cur.reveal.step] : null;
         for (k = 0; k < cols.length; k++) {
           c = cols[k];
           if (c.t === "p") { html += cell(".", "pt"); continue; }
           i = c.i;
-          if (i < div.DS.length) html += cell(div.DS[i]);
-          else if (step && i <= step.i) html += cell("0", "dim");
-          else html += cell("");
+          var dContent, dCls = "", dAttr = "";
+          if (i < div.DS.length) dContent = div.DS[i];
+          else if (step && i <= step.i) { dContent = "0"; dCls = "dim"; }
+          else dContent = "";
+          if (orosuStep && i === orosuStep.i + 1 && dContent !== "") {
+            dCls = (dCls ? dCls + " " : "") + "src-mark";
+            dAttr = ' data-orosu-src="1"';
+          }
+          html += cell(dContent, dCls, dAttr);
         }
         // 作業の行（終わったステップごと：積→線→あまり＋次に下ろす数字）
         for (var s = 0; s < cur.stepIdx && s < div.steps.length; s++) {
@@ -824,7 +838,7 @@
             if (c.t === "p") { html += workCell("", "pt"); continue; }
             i = c.i;
             var pd = i >= prodStart && i <= st.i ? prodStr[i - prodStart] : "";
-            html += workCell(pd);
+            html += workCell(pd, pd !== "" ? "prod" : "");
           }
           if (!(cur.reveal && cur.reveal.step === s && cur.reveal.stage === 0)) {
           // 線
@@ -838,8 +852,11 @@
             c = cols[k];
             if (c.t === "p") { html += workCell("", "pt"); continue; }
             i = c.i;
-            if (i >= remStart && i <= st.i) html += workCell(remStr[i - remStart]);
-            else if (next && i === st.i + 1 && !(cur.reveal && cur.reveal.step === s && cur.reveal.stage === 1)) html += workCell(i < div.DS.length ? div.DS[i] : "0", "dim");
+            if (i >= remStart && i <= st.i) html += workCell(remStr[i - remStart], "rem");
+            else if (next && i === st.i + 1 && !(cur.reveal && cur.reveal.step === s && cur.reveal.stage === 1)) {
+              var oLive = !!(cur.reveal && cur.reveal.step === s && cur.reveal.stage === 2);
+              html += workCell(i < div.DS.length ? div.DS[i] : "0", oLive ? "down down-live" : "down", oLive ? ' data-orosu-dst="1"' : "");
+            }
             else html += workCell("");
           }
           }
@@ -848,6 +865,30 @@
         html += '<div class="h-note" id="h-note"></div>';
         $("stage-area").innerHTML = html;
         updateDivNote();
+        positionOrosuArrow();
+      }
+      // おろす段階表示のとき、出どころの数字から下ろした数字へ矢印を重ねる（表示だけの演出）
+      function positionOrosuArrow() {
+        var grid = document.querySelector(".h-grid");
+        if (!grid) return;
+        var srcEl = grid.querySelector("[data-orosu-src]");
+        var dstEl = grid.querySelector("[data-orosu-dst]");
+        if (!srcEl || !dstEl) return;
+        var gr = grid.getBoundingClientRect();
+        var sr = srcEl.getBoundingClientRect();
+        var dr = dstEl.getBoundingClientRect();
+        var x = Math.round((sr.left + sr.right) / 2 - gr.left);
+        var y1 = Math.round(sr.bottom - gr.top) + 1;
+        var y2 = Math.round(dr.top - gr.top) - 1;
+        if (y2 - y1 < 10) return;
+        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("class", "orosu-arrow");
+        svg.setAttribute("width", String(Math.round(gr.width)));
+        svg.setAttribute("height", String(Math.round(gr.height)));
+        svg.setAttribute("aria-hidden", "true");
+        svg.innerHTML = '<line x1="' + x + '" y1="' + y1 + '" x2="' + x + '" y2="' + (y2 - 6) + '" stroke="#7a5faa" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/>' +
+          '<polygon points="' + (x - 5) + "," + (y2 - 7) + " " + (x + 5) + "," + (y2 - 7) + " " + x + "," + y2 + '" fill="#7a5faa" opacity="0.85"/>';
+        grid.appendChild(svg);
       }
       var PILL_LABELS = ["① たてる", "② かける", "③ ひく", "④ おろす"];
       var PILL_KEYS = ["tateru", "kakeru", "hiku", "orosu"];
