@@ -88,7 +88,7 @@
       .panel { background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 16px 20px; }
       .quiz-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 54px; }
       .progress-label { font-weight: 800; font-size: 16px; color: var(--muted); white-space: nowrap; }
-      .progress-bar { height: 10px; background: var(--primary-soft); border-radius: 999px; overflow: hidden; margin: 6px 0 12px; }
+      .progress-bar { height: 10px; background: var(--primary-soft); border-radius: 999px; overflow: hidden; margin: 4px 0 8px; }
       #progress-fill { height: 100%; background: var(--primary); border-radius: 999px; transition: width .3s; }
       .navi { display: inline-flex; align-items: center; gap: 10px; }
       .navi-avatar { display: inline-flex; width: 44px; height: 54px; align-items: flex-end; justify-content: center; overflow: hidden; }
@@ -99,27 +99,34 @@
       .problem { font-size: 34px; font-weight: 900; text-align: center; letter-spacing: .04em; margin: 4px 0 10px; }
       .problem .hl { color: var(--bad); }
       .step-label { display: inline-block; background: var(--primary); color: #fff; font-size: 14px; font-weight: 800; border-radius: 999px; padding: 4px 14px; margin-bottom: 6px; }
-      .step-prompt { font-size: 18px; font-weight: 700; line-height: 1.6; margin-bottom: 10px; }
+      .step-prompt { font-size: 18px; font-weight: 700; line-height: 1.6; margin-bottom: 6px; }
       .choices { display: flex; gap: 10px; flex-wrap: wrap; }
       .choice-btn { border: 3px solid var(--primary); background: #fff; color: var(--primary-dark); border-radius: 14px; padding: 12px 20px; font: inherit; font-size: 20px; font-weight: 800; cursor: pointer; min-width: 92px; }
       .choice-btn:active { transform: scale(.96); }
       .choice-btn.picked { background: var(--primary); color: #fff; }
 
       /* hissan（わり算の筆算） */
-      .hissan { display: flex; justify-content: center; margin: 2px 0 4px; }
-      .h-grid { display: grid; gap: 0 2px; font-variant-numeric: tabular-nums; }
-      .h-cell { width: var(--cell); height: var(--cell); display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 800; border-radius: 8px; }
-      .h-cell.sign2 { width: 78px; font-size: 25px; justify-content: flex-end; padding-right: 6px; color: var(--ink); }
-      .h-cell.pt { width: 14px; font-size: 26px; font-weight: 900; }
-      .h-cell.work { height: 33px; font-size: 23px; }
-      .h-cell.target { background: var(--amber-soft); outline: 3px solid var(--amber); animation: pulse 1s infinite; }
+      .hissan { display: flex; justify-content: center; margin: 0 0 2px; }
+      .h-grid { display: grid; gap: 0 3px; font-variant-numeric: tabular-nums; }
+      .h-cell { width: var(--cell); height: var(--cell); display: flex; align-items: center; justify-content: center; font-size: calc(var(--cell) * 0.66); font-weight: 800; border-radius: 8px; border: 2px solid #d9e9f4; background: #fff; box-sizing: border-box; }
+      .h-cell.sign2 { width: calc(var(--cell) * 1.7); font-size: calc(var(--cell) * 0.54); justify-content: flex-end; padding-right: 6px; color: var(--ink); border-color: transparent; background: transparent; }
+      .h-cell.pt { width: calc(var(--cell) * 0.3); font-size: calc(var(--cell) * 0.57); font-weight: 900; border-color: transparent; background: transparent; }
+      .h-cell.work { height: calc(var(--cell) * 0.56); font-size: calc(var(--cell) * 0.5); }
+      .h-cell.target { background: var(--amber-soft); border: 3px solid var(--amber); color: #b97a0f; animation: pulse 1s infinite; }
       .h-cell.filled { color: var(--ink); }
       .h-cell.dim { color: #a9c3d6; }
       .h-cell.prefill { color: var(--muted); }
-      .h-line { border-bottom: 3px solid var(--ink); height: 6px; }
-      .h-part { border-bottom: 3px solid var(--ink); height: 5px; }
-      @keyframes pulse { 0%,100% { outline-offset: 0; } 50% { outline-offset: 2px; } }
-      .h-note { text-align: center; color: var(--muted); font-size: 14px; min-height: 20px; }
+      .h-line { border-bottom: 3px solid var(--ink); height: 4px; }
+      .h-part { border-bottom: 3px solid var(--ink); height: 3px; }
+      @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(245,166,35,.45); } 50% { box-shadow: 0 0 0 7px rgba(245,166,35,0); } }
+      /* 筆算の小ステップ表示（たてる→かける→ひく→おろす） */
+      .hissan-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 2px; }
+      .hissan-head .step-label { margin-bottom: 0; }
+      .step-pills { display: flex; gap: 8px; justify-content: center; margin: 0; flex-wrap: wrap; }
+      .step-pills .pill { border: 2px solid var(--line); background: #fff; color: var(--muted); border-radius: 999px; padding: 3px 13px; font-size: 15px; font-weight: 800; }
+      .step-pills .pill.done { background: var(--primary-soft); border-color: var(--primary-soft); color: var(--primary-dark); }
+      .step-pills .pill.active { background: var(--amber-soft); border-color: var(--amber); color: #8a5a00; box-shadow: 0 0 0 3px rgba(245,166,35,.25); }
+      .h-note { text-align: center; color: var(--muted); font-size: 14px; min-height: 16px; }
 
       /* point placement */
       .point-stage { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 6px 0; }
@@ -144,7 +151,7 @@
       .actions { display: flex; gap: 10px; }
       .actions .btn { flex: 1; padding: 13px 10px; font-size: 18px; }
 
-      .feedback { margin-top: 14px; border-radius: 14px; padding: 10px 14px; min-height: 76px; background: #f7fbfe; border: 2px solid var(--line); }
+      .feedback { margin-top: 10px; border-radius: 14px; padding: 8px 14px; min-height: 76px; background: #f7fbfe; border: 2px solid var(--line); }
       .feedback.good { background: var(--good-soft); border-color: var(--good); }
       .feedback.bad { background: var(--bad-soft); border-color: var(--bad); }
       .feedback-inner { display: flex; gap: 12px; align-items: center; }
@@ -742,7 +749,7 @@
         var p = cur.p;
         cur.phase = "hissan";
         cur.div = buildDivSteps(p);
-        cur.stepIdx = 0; cur.filledQ = {}; cur.consecErr = 0;
+        cur.stepIdx = 0; cur.filledQ = {}; cur.consecErr = 0; cur.reveal = null;
         setKeypadEnabled(true);
         drawDiv();
         if (cur.estMsg) {
@@ -775,12 +782,13 @@
         var div = cur.div;
         var cols = divCols();
         var step = div.steps[cur.stepIdx];
-        var tmpl = "78px " + cols.map(function (c) { return c.t === "p" ? "14px" : "var(--cell)"; }).join(" ");
+        var tmpl = "calc(var(--cell) * 1.7) " + cols.map(function (c) { return c.t === "p" ? "calc(var(--cell) * 0.3)" : "var(--cell)"; }).join(" ");
         function cell(content, cls) { return '<span class="h-cell ' + (cls || "") + '">' + (content === "" || content == null ? "&nbsp;" : content) + "</span>"; }
         function workCell(content, cls) { return '<span class="h-cell work ' + (cls || "") + '">' + (content === "" || content == null ? "&nbsp;" : content) + "</span>"; }
-        var html = '<span class="step-label">ステップ2：筆算</span>' +
+        var cellPx = div.steps.length <= 1 ? 64 : (div.steps.length === 2 ? 60 : 48);
+        var html = '<div class="hissan-head"><span class="step-label">ステップ2：筆算</span>' + pillsHTML() + '</div>' +
           '<div class="step-prompt">' + div.Dstr + " ÷ " + p.db + ' を 計算しよう</div>' +
-          '<div class="hissan"><div class="h-grid" style="grid-template-columns: ' + tmpl + ';">';
+          '<div class="hissan"><div class="h-grid" style="--cell: ' + cellPx + 'px; grid-template-columns: ' + tmpl + ';">';
         var k, c, i;
         // 商の行
         html += '<span class="h-cell sign2">&nbsp;</span>';
@@ -789,7 +797,7 @@
           if (c.t === "p") { html += cell("", "pt"); continue; }
           i = c.i;
           if (cur.filledQ[i] != null) html += cell(cur.filledQ[i], "filled");
-          else if (step && step.i === i) html += cell("", "target");
+          else if (step && step.i === i) html += cell("?", "target");
           else if (div.prefillZero && i === div.pointPos - 1) html += cell("0", "prefill");
           else html += cell("");
         }
@@ -818,6 +826,7 @@
             var pd = i >= prodStart && i <= st.i ? prodStr[i - prodStart] : "";
             html += workCell(pd);
           }
+          if (!(cur.reveal && cur.reveal.step === s && cur.reveal.stage === 0)) {
           // 線
           html += '<div class="h-part" style="grid-column: ' + divColIndex(cols, prodStart) + " / " + (divColIndex(cols, st.i) + 1) + ';"></div>';
           // あまりの行（次のステップがあれば、下ろしてきた数字を うすく 添える）
@@ -830,8 +839,9 @@
             if (c.t === "p") { html += workCell("", "pt"); continue; }
             i = c.i;
             if (i >= remStart && i <= st.i) html += workCell(remStr[i - remStart]);
-            else if (next && i === st.i + 1) html += workCell(i < div.DS.length ? div.DS[i] : "0", "dim");
+            else if (next && i === st.i + 1 && !(cur.reveal && cur.reveal.step === s && cur.reveal.stage === 1)) html += workCell(i < div.DS.length ? div.DS[i] : "0", "dim");
             else html += workCell("");
+          }
           }
         }
         html += "</div></div>";
@@ -839,11 +849,74 @@
         $("stage-area").innerHTML = html;
         updateDivNote();
       }
+      var PILL_LABELS = ["① たてる", "② かける", "③ ひく", "④ おろす"];
+      var PILL_KEYS = ["tateru", "kakeru", "hiku", "orosu"];
+      function pillsHTML() {
+        var active = cur.reveal ? cur.reveal.stage + 1 : 0;
+        var html = '<div class="step-pills" aria-hidden="true">';
+        for (var n = 0; n < 4; n++) {
+          var cls = n < active ? "done" : (n === active ? "active" : "");
+          html += '<span class="pill ' + cls + '" data-pill="' + PILL_KEYS[n] + '">' + PILL_LABELS[n] + "</span>";
+        }
+        return html + "</div>";
+      }
+      var revealSeq = 0;
+      function revealAlive(id) {
+        return !!(cur && cur.phase === "hissan" && cur.reveal && cur.reveal.id === id && !$("view-quiz").classList.contains("hidden"));
+      }
+      // 商が正解したら、かける→ひく→おろす を順に見せる（表示だけの演出。判定は変えない）
+      function startReveal(isLast) {
+        var id = ++revealSeq;
+        cur.reveal = { step: cur.stepIdx, stage: 0, id: id };
+        cur.stepIdx++;
+        drawDiv();
+        var D1 = 500, D2 = 500, D3 = 560;
+        setTimeout(function () {
+          if (!revealAlive(id)) return;
+          cur.reveal.stage = 1;
+          drawDiv();
+        }, D1);
+        if (isLast) {
+          setTimeout(function () {
+            if (!revealAlive(id)) return;
+            cur.reveal = null;
+            drawDiv();
+            finishHissan();
+          }, D1 + D2);
+        } else {
+          setTimeout(function () {
+            if (!revealAlive(id)) return;
+            cur.reveal.stage = 2;
+            drawDiv();
+          }, D1 + D2);
+          setTimeout(function () {
+            if (!revealAlive(id)) return;
+            cur.reveal = null;
+            drawDiv();
+          }, D1 + D2 + D3);
+        }
+      }
       function updateDivNote() {
         var div = cur.div;
         var step = div.steps[cur.stepIdx];
         var note = $("h-note");
-        if (!step || !note) return;
+        if (!note) return;
+        if (cur.reveal) {
+          var rst = div.steps[cur.reveal.step];
+          if (!rst) return;
+          if (cur.reveal.stage === 0) {
+            note.textContent = cur.p.db + " × " + rst.q + " ＝ " + rst.prod + " ： かける ところを 見よう";
+            setAnswerBox("かける：" + cur.p.db + " × " + rst.q, false);
+          } else if (cur.reveal.stage === 1) {
+            note.textContent = rst.working + " − " + rst.prod + " ＝ " + rst.rAfter + " ： ひいた 結果を 見よう";
+            setAnswerBox("ひく：" + rst.working + " − " + rst.prod, false);
+          } else {
+            note.textContent = "あまりに 次の 数字を おろして こよう";
+            setAnswerBox("おろす：次の 数字", false);
+          }
+          return;
+        }
+        if (!step) return;
         var place = placeNameEx(div.pointPos - 1 - step.i);
         note.textContent = step.working + " ÷ " + cur.p.db + " ： " + place + " の 商を 立てよう";
         setAnswerBox("いまの マス：" + place + " の 商", false);
@@ -851,21 +924,16 @@
       function onKeyDigit(d) {
         if (!cur) return;
         if (cur.phase !== "hissan") return;
+        if (cur.reveal) return;
         var step = cur.div.steps[cur.stepIdx];
         if (!step) return;
         var p = cur.p;
         if (d === step.q) {
           cur.filledQ[step.i] = d;
-          cur.stepIdx++;
           cur.consecErr = 0;
-          if (cur.stepIdx >= cur.div.steps.length) {
-            playSound("correct");
-            drawDiv();
-            finishHissan();
-          } else {
-            playSound("click");
-            drawDiv();
-          }
+          var isLast = cur.stepIdx >= cur.div.steps.length - 1;
+          playSound(isLast ? "correct" : "click");
+          startReveal(isLast);
         } else {
           cur.stageFlags.hissan = true;
           cur.consecErr++;
