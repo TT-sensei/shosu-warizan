@@ -1324,7 +1324,7 @@
       function recordOutcome(flawless) {
         var p = cur.p;
         var stages = Object.keys(cur.stageFlags).filter(function (k) { return cur.stageFlags[k]; });
-        recordSkillProfile(p, cur.stageFlags);
+        if (session.mode !== "tokkun") recordSkillProfile(p, cur.stageFlags);
         if (session.mode !== "tokkun") {
           var stats = loadStats();
           stats[p.type].total += 1;
@@ -1457,7 +1457,7 @@
           var status = item.attempts < 3 ? "記録を集めています" : item.errors / item.attempts >= 0.4 ? "ここを中心に練習中" : rate >= 85 ? "安定してきたね" : "練習を続けよう";
           var detail = item.attempts < 3
             ? (item.attempts === 0 ? "これから練習の記録を集めるよ。" : "もう少し取り組んで、様子を見よう。")
-            : "初回でできた：" + item.clean + " / " + item.attempts + "回";
+            : "1回目でできた：" + item.clean + " / " + item.attempts + "回";
           var card = document.createElement("div");
           card.className = "skill-card";
           card.innerHTML = "<h4>" + SKILL_LABELS[key] + "</h4>" +
