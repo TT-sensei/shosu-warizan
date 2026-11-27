@@ -436,6 +436,7 @@
       var LS_SETTINGS = "shosuWarizan.settings.v1";
       var LS_SKILL_PROFILE = "shosuWarizan.skillProfile.v1";
       var LS_ACTIVE_LEARNER = "shosuWarizan.activeLearner.v1";
+      var LS_SINGLE_MIGRATION = "shosuWarizan.singleLearnerMigration.v1";
 
       function loadJSON(key, fallback) {
         try {
@@ -452,6 +453,7 @@
       // 旧データは削除せず残し、今後は共通キーだけを使う。
       function migrateToSingleLearner() {
         try {
+          if (localStorage.getItem(LS_SINGLE_MIGRATION) === "done") return;
           var selected = Number(loadJSON(LS_ACTIVE_LEARNER, 1));
           if (!Number.isInteger(selected) || selected < 1 || selected > 6) selected = 1;
           [LS_MISTAKES, LS_STATS, LS_SKILL_PROFILE].forEach(function (key) {
@@ -460,6 +462,7 @@
             if (preferred !== null) localStorage.setItem(key, preferred);
           });
           localStorage.removeItem(LS_ACTIVE_LEARNER);
+          localStorage.setItem(LS_SINGLE_MIGRATION, "done");
         } catch (e) { /* 保存できない環境でも学習は続ける */ }
       }
       migrateToSingleLearner();
