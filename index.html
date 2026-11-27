@@ -30,6 +30,10 @@
         --kai-soft: #def3f0;
         --saku: #d6567f;
         --saku-soft: #fbe7ee;
+        --sora: #e2703a;
+        --sora-soft: #fdeee6;
+        --nami: #7c5cbf;
+        --nami-soft: #efeaf8;
         --radius: 18px;
         --cell: 46px;
       }
@@ -53,20 +57,21 @@
       .home-lead { display: flex; gap: 18px; align-items: center; background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 16px 20px; }
       .home-lead-copy { flex: 1; min-width: 260px; }
       .lead { font-size: 18px; line-height: 1.7; margin: 0 0 8px; }
-      .home-group { width: 300px; max-width: 42%; height: auto; border-radius: 12px; }
+      .home-group { width: 250px; max-width: 42%; height: auto; border-radius: 12px; }
       .map-links { display: flex; gap: 8px; flex-wrap: wrap; }
       .map-links a, .learning-map-link { color: var(--primary-dark); font-weight: 700; font-size: 14px; text-decoration: none; border-bottom: 2px solid var(--primary-soft); }
 
-      .section-label { font-size: 20px; margin: 20px 0 10px; }
+      .section-label { font-size: 20px; margin: 16px 0 8px; }
+      #type-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
       .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
-      .type-card { text-align: left; border: 3px solid var(--line); border-top: 10px solid var(--tc, var(--primary)); background: #fff; border-radius: var(--radius); padding: 14px 16px; cursor: pointer; font: inherit; color: var(--ink); }
+      .type-card { text-align: left; border: 3px solid var(--line); border-top: 10px solid var(--tc, var(--primary)); background: #fff; border-radius: var(--radius); padding: 12px 14px; cursor: pointer; font: inherit; color: var(--ink); }
       .type-card:active { transform: scale(.98); }
       .type-card .tc-label { font-size: 19px; font-weight: 800; display: block; margin-bottom: 4px; }
       .type-card .tc-desc { font-size: 14px; color: var(--muted); line-height: 1.55; display: block; }
       .type-card .tc-navi { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--tc, var(--primary)); }
       .type-card .tc-navi img { width: 34px; height: 44px; object-fit: contain; }
 
-      .learning-note { margin-top: 20px; background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 16px 20px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+      .learning-note { margin-top: 14px; background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 12px 18px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
       .learning-note h2 { margin: 2px 0 6px; font-size: 20px; }
       .learning-note p { margin: 0 0 6px; line-height: 1.65; }
       .learning-eyebrow { color: var(--primary); font-weight: 800; font-size: 12px; letter-spacing: .14em; margin: 0; }
@@ -74,7 +79,7 @@
       .point-demo b { color: var(--primary-dark); }
       .point-demo .pd { color: var(--bad); font-weight: 900; }
 
-      .menu-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+      .menu-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
       .menu-btn { position: relative; text-align: left; border: 3px solid var(--primary); background: #fff; color: var(--ink); border-radius: var(--radius); padding: 14px 16px; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer; }
       .menu-btn small { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-top: 4px; line-height: 1.5; }
       .menu-btn .count { position: absolute; top: -10px; right: 12px; background: var(--bad); color: #fff; border-radius: 999px; padding: 2px 10px; font-size: 14px; }
@@ -183,6 +188,79 @@
       .anim-shake { animation: shake .35s ease; }
       @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
 
+      /* ---------- うごかして発見：大きな入り口 ---------- */
+      .big-entry { display: flex; gap: 16px; align-items: center; width: 100%; text-align: left; border: 3px solid var(--sora); border-top: 10px solid var(--sora); background: #fff; border-radius: var(--radius); padding: 12px 18px; cursor: pointer; font: inherit; color: var(--ink); }
+      .big-entry:active { transform: scale(.99); }
+      .big-entry .be-label { font-size: 22px; font-weight: 900; display: block; margin-bottom: 2px; }
+      .big-entry .be-desc { font-size: 15px; color: var(--muted); display: block; line-height: 1.5; }
+      .big-entry .be-navi { font-size: 13px; font-weight: 700; color: var(--sora); display: block; margin-top: 4px; }
+
+      /* ---------- 小数スライダー ---------- */
+      .slider { background: #f7fbfe; border: 2px solid var(--line); border-radius: 14px; padding: 10px 12px 10px; margin-top: 6px; }
+      .sl-head { position: relative; height: 18px; margin-left: 86px; }
+      .sl-place { position: absolute; top: 0; width: 54px; text-align: center; font-size: 12px; font-weight: 800; color: var(--muted); white-space: nowrap; }
+      .sl-row { display: flex; align-items: flex-start; margin-top: 4px; }
+      .sl-label { width: 86px; flex: none; font-weight: 800; font-size: 14.5px; padding-top: 13px; line-height: 1.3; }
+      .sl-track { position: relative; height: 66px; flex: none; width: 450px; }
+      .sl-point { position: absolute; top: -3px; bottom: 0; width: 0; border-left: 3px dashed #e39a2d; }
+      .sl-digit { position: absolute; top: 2px; width: 54px; height: 44px; border: 3px solid var(--primary); background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 27px; font-weight: 900; color: var(--primary-dark); transition: left .45s ease; z-index: 1; }
+      .sl-digit.b-num { border-color: #7a5faa; color: #5b4390; }
+      .sl-val { position: absolute; top: 48px; width: 54px; text-align: center; font-size: 12.5px; font-weight: 700; color: var(--muted); transition: left .45s ease; }
+      .eq-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 21px; font-weight: 900; margin: 4px 0 2px; min-height: 32px; }
+      .eq-arrow { color: var(--primary); }
+      .same-chip { background: var(--good-soft); color: var(--good); border: 2px solid var(--good); border-radius: 999px; padding: 3px 12px; font-size: 14.5px; font-weight: 800; }
+      .diff-chip { background: var(--bad-soft); color: var(--bad); border: 2px solid var(--bad); border-radius: 999px; padding: 3px 12px; font-size: 14.5px; font-weight: 800; }
+      .sl-controls { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+      .sl-btn { border: 3px solid var(--primary); background: var(--primary); color: #fff; border-radius: 14px; padding: 9px 20px; font: inherit; font-size: 19px; font-weight: 900; cursor: pointer; }
+      .sl-btn.sub { background: #fff; color: var(--primary-dark); }
+      .sl-btn:disabled { opacity: .35; cursor: default; }
+      .sl-btn:active:not(:disabled) { transform: scale(.96); }
+      .target-seg { display: inline-flex; border: 2px solid var(--line); border-radius: 999px; overflow: hidden; background: #fff; }
+      .target-seg button { border: none; background: #fff; padding: 9px 13px; font: inherit; font-size: 14.5px; font-weight: 800; cursor: pointer; color: var(--muted); }
+      .target-seg button.on { background: var(--primary); color: #fff; }
+
+      /* ---------- 発見モード ---------- */
+      .disc-grid { display: grid; grid-template-columns: 1fr 296px; gap: 16px; align-items: start; }
+      .num-fields { display: flex; gap: 10px; }
+      .num-field { flex: 1; border: 3px solid var(--line); border-radius: 14px; background: #fff; padding: 6px 10px; cursor: pointer; text-align: center; }
+      .num-field.on { border-color: var(--amber); background: var(--amber-soft); }
+      .num-field .nf-label { font-size: 12.5px; font-weight: 800; color: var(--muted); }
+      .num-field .nf-val { font-size: 27px; font-weight: 900; min-height: 34px; line-height: 1.25; }
+      .disc-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+      .disc-keypad button { border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 4px 0; font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; color: var(--ink); }
+      .disc-keypad button:active { background: var(--primary-soft); transform: scale(.96); }
+      .mission-title { font-size: 15px; margin: 10px 0 6px; }
+      .mission-item { display: block; width: 100%; text-align: left; border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 6px 10px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--ink); margin-bottom: 6px; line-height: 1.4; }
+      .mission-item.on { border-color: var(--amber); background: var(--amber-soft); }
+      .mission-item.done { border-color: var(--good); background: var(--good-soft); }
+      .mission-area { margin-top: 10px; }
+      .ask-box { background: #fff8ec; border: 2px solid var(--amber); border-radius: 14px; padding: 10px 14px; }
+      #view-discover .panel { padding: 12px 16px; }
+      #disc-feedback .feedback-copy { font-size: 14.5px; }
+      .ask-note { font-size: 14px; color: var(--muted); font-weight: 700; margin-top: 6px; }
+
+      /* ---------- レッスン ---------- */
+      .lesson-foot { display: flex; justify-content: flex-end; margin-top: 10px; }
+      .lesson-foot .btn { padding: 12px 28px; font-size: 18px; }
+      .big-expr { font-size: 32px; font-weight: 900; text-align: center; margin: 6px 0 10px; letter-spacing: .03em; }
+      .model-note { font-size: 17.5px; font-weight: 700; line-height: 1.65; text-align: center; margin: 8px 0; }
+      .model-btn-row { display: flex; justify-content: center; margin: 8px 0; }
+      .cells { display: grid; gap: 3px; margin: 8px auto; max-width: 640px; }
+      .cell01 { height: 23px; border-radius: 5px; background: #e8f3fb; border: 2px solid #c4dff2; }
+      .cell01.on { background: var(--primary); border-color: var(--primary-dark); }
+      .cell01.g2 { background: var(--amber); border-color: #d98d0b; }
+      .cell01.ga { background: var(--primary); border-color: var(--primary-dark); }
+      .cell01.gb { background: #0f9488; border-color: #0b6e66; }
+      .summary-box { background: var(--primary-soft); border-radius: 14px; padding: 12px 18px; font-size: 18px; font-weight: 800; line-height: 1.8; text-align: center; margin: 10px 0; }
+      .summary-box b { color: var(--primary-dark); }
+      .d-blocks { display: flex; gap: 18px; justify-content: center; align-items: flex-end; margin: 10px 0; flex-wrap: wrap; }
+      .d-group { text-align: center; }
+      .d-group-label { font-size: 14px; font-weight: 800; color: var(--muted); margin-top: 6px; }
+      .d-units { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; max-width: 240px; }
+      .d-unit { width: 54px; height: 54px; border-radius: 10px; background: var(--primary-soft); border: 3px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 21px; font-weight: 900; color: var(--primary-dark); }
+      .d-unit.rem { background: var(--amber-soft); border-color: var(--amber); color: #8a5a00; }
+      .d-unit.mini { width: 30px; height: 30px; font-size: 12.5px; border-radius: 7px; border-width: 2px; }
+
       @media (max-width: 900px) {
         .quiz-layout { grid-template-columns: 1fr; }
         .home-group { display: none; }
@@ -205,7 +283,7 @@
 
         <div class="home-lead">
           <div class="home-lead-copy">
-            <p class="lead">まずは 答えが もとの数より 大きくなるか 小さくなるかを 見当して、筆算で わり算を して、さいごに 小数点の 位置を 自分で 確かめよう。1回は 10問です。</p>
+            <p class="lead">小数スライダーを うごかして「なぜ 整数に 直して いいのか」を つかんでから、筆算に チャレンジしよう。見当 → スライダー → 筆算 → 小数点の 位置 確かめ、の順に 進めます。1回は 10問です。</p>
             <nav class="map-links" aria-label="学びの地図">
               <a href="https://tt-sensei.github.io/jp-learning-taxonomy/site/v2/#topic=jp.elem.math.decimal-multiply-divide" target="_blank" rel="noopener">小数のかけ算・わり算（学びの地図）</a>
             </nav>
@@ -222,7 +300,20 @@
           </script>
         </div>
 
-        <h2 class="section-label">れんしゅうを えらぼう</h2>
+        <h2 class="section-label">うごかして 発見</h2>
+        <button class="big-entry" id="btn-discover">
+          <span class="navi-avatar" style="width:52px;height:66px;"><img class="navi-avatar-img" style="height:66px;" src="https://tt-sensei.github.io/navi-character-/assets/web/characters/sora/fullbody/waving.webp" alt="" aria-hidden="true" decoding="async" onerror="this.parentElement.remove()" /></span>
+          <span>
+            <span class="be-label">うごかして発見</span>
+            <span class="be-desc">小数スライダーを 自由に うごかして、数の 変化を 見てみよう</span>
+            <span class="be-navi">案内：そら</span>
+          </span>
+        </button>
+
+        <h2 class="section-label">しくみを理解</h2>
+        <div class="grid" id="lesson-grid"></div>
+
+        <h2 class="section-label">計算に挑戦</h2>
         <div class="grid" id="type-grid"></div>
 
         <section class="learning-note" aria-labelledby="point-heading">
@@ -305,6 +396,101 @@
         </div>
       </section>
 
+      <!-- ============ うごかして発見 ============ -->
+      <section id="view-discover" class="hidden">
+        <div class="back-row">
+          <button class="btn ghost" id="btn-discover-back">← トップへ もどる</button>
+        </div>
+        <div class="panel">
+          <div class="quiz-head">
+            <span id="disc-navi"></span>
+            <span class="progress-label">自由に うごかして みよう</span>
+          </div>
+          <div class="disc-grid">
+            <div>
+              <div class="eq-line" id="disc-eq"></div>
+              <div id="disc-slider"></div>
+              <div class="sl-controls">
+                <span class="target-seg" id="disc-target">
+                  <button type="button" data-tg="both" class="on">両方</button>
+                  <button type="button" data-tg="a">割られる数だけ</button>
+                  <button type="button" data-tg="b">割る数だけ</button>
+                </span>
+                <button type="button" class="sl-btn" id="disc-x10">×10</button>
+                <button type="button" class="sl-btn" id="disc-x100">×100</button>
+                <button type="button" class="sl-btn sub" id="disc-d10">÷10</button>
+                <button type="button" class="sl-btn sub" id="disc-reset">もとに もどす</button>
+              </div>
+              <div class="mission-area" id="mission-area"></div>
+            </div>
+            <div>
+              <div class="num-fields">
+                <div class="num-field on" id="nf-a" role="button" tabindex="0">
+                  <div class="nf-label">割られる数</div>
+                  <div class="nf-val" id="nf-a-val">3.6</div>
+                </div>
+                <div class="num-field" id="nf-b" role="button" tabindex="0">
+                  <div class="nf-label">割る数</div>
+                  <div class="nf-val" id="nf-b-val">1.2</div>
+                </div>
+              </div>
+              <div class="disc-keypad" id="disc-keypad">
+                <button type="button" data-dk="1">1</button>
+                <button type="button" data-dk="2">2</button>
+                <button type="button" data-dk="3">3</button>
+                <button type="button" data-dk="4">4</button>
+                <button type="button" data-dk="5">5</button>
+                <button type="button" data-dk="6">6</button>
+                <button type="button" data-dk="7">7</button>
+                <button type="button" data-dk="8">8</button>
+                <button type="button" data-dk="9">9</button>
+                <button type="button" data-dk=".">.</button>
+                <button type="button" data-dk="0">0</button>
+                <button type="button" data-dk="del">⌫</button>
+              </div>
+              <h3 class="mission-title">発見ミッション</h3>
+              <div id="mission-list"></div>
+            </div>
+          </div>
+          <div class="feedback" id="disc-feedback" role="status" aria-live="polite">
+            <div class="feedback-inner">
+              <span class="feedback-navi" id="disc-feedback-navi" aria-hidden="true"></span>
+              <div class="feedback-copy">
+                <div class="verdict" id="disc-verdict"></div>
+                <div id="disc-feedback-body"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ しくみを理解（レッスン） ============ -->
+      <section id="view-lesson" class="hidden">
+        <div class="back-row">
+          <button class="btn ghost" id="btn-lesson-back">← トップへ もどる</button>
+        </div>
+        <div class="panel">
+          <div class="quiz-head">
+            <span id="lesson-navi"></span>
+            <span class="progress-label" id="lesson-progress" aria-live="polite"></span>
+          </div>
+          <div class="progress-bar" aria-hidden="true"><div id="lesson-fill" style="width:0%"></div></div>
+          <div id="lesson-stage"></div>
+          <div class="feedback" id="lesson-feedback" role="status" aria-live="polite">
+            <div class="feedback-inner">
+              <span class="feedback-navi" id="lesson-feedback-navi" aria-hidden="true"></span>
+              <div class="feedback-copy">
+                <div class="verdict" id="lesson-verdict"></div>
+                <div id="lesson-feedback-body"></div>
+              </div>
+            </div>
+          </div>
+          <div class="lesson-foot">
+            <button class="btn primary hidden" id="btn-lesson-next">つぎへ →</button>
+          </div>
+        </div>
+      </section>
+
       <!-- ============ 結果画面 ============ -->
       <section id="view-result" class="hidden">
         <div class="panel">
@@ -356,6 +542,20 @@
           hint: "両方を 100倍すると わる数が 整数に なるよ",
           explain: "わる数が小数第2位までなら、両方を100倍します。0.25のような1より小さい数でわると、答えはもとの数より大きくなります。"
         },
+        intdiv: {
+          label: "整数 ÷ 小数",
+          desc: "6 ÷ 0.3 のような、整数を 小数で わる わり算",
+          navi: "なみ", naviId: "nami", color: "var(--nami)",
+          hint: "両方を 10倍すると、0.1が 何個分あるか 見えてくるよ",
+          explain: "整数 ÷ 小数では、両方を10倍すると、割る数が整数になります。0.1の個数で考えると「何個分あるか」のわり算です。わる数が1より小さいと、答えはもとの数より大きくなります。"
+        },
+        intint: {
+          label: "整数 ÷ 整数（発展）",
+          desc: "5 ÷ 2 のように、わり切れるまで 小数で 答える わり算",
+          navi: "さく", naviId: "saku", color: "var(--saku)",
+          hint: "あまりを さらに 分けると、小数の 答えに なるよ",
+          explain: "整数 ÷ 整数でわり切れないときは、あまりを0.1に分けて分け続けると、小数で答えられます。商の小数点は、わられる数の小数点の真上に打ちます。"
+        },
         mix: {
           label: "ミックス チャレンジ",
           desc: "わる数が 1より 小さい 問題も 入った ミックス",
@@ -364,7 +564,7 @@
           explain: "いろいろな型がまざっています。わる数が1より小さいかどうかで、答えがもとの数より大きくなるか小さくなるかが変わります。"
         }
       };
-      var TYPE_KEYS = ["review", "basic", "step2", "mix"];
+      var TYPE_KEYS = ["review", "intdiv", "basic", "step2", "intint", "mix"];
 
       /* ================= 保存（この端末の中だけ） ================= */
       var LS_MISTAKES = "shosuWarizan.mistakes.v1";
@@ -548,6 +748,19 @@
           else if (qp === 1) qd = randInt(12, 99);
           else qd = randInt(105, 395);
           if (qd % 10 === 0) return null;
+        } else if (kind === "intdiv") {
+          pb = 1;
+          if (wantSmall) db = randInt(2, 9);
+          else { do { db = randInt(11, 49); } while (db % 10 === 0); }
+          qp = pick([0, 0, 0, 1]);
+          if (qp === 0) qd = randInt(2, 60);
+          else { do { qd = randInt(11, 99); } while (qd % 10 === 0); }
+        } else if (kind === "intint") {
+          pb = 0;
+          db = pick([2, 4, 5, 8, 12, 16, 20, 25]);
+          qp = pick([1, 1, 2]);
+          if (qp === 1) { do { qd = randInt(11, 99); } while (qd % 10 === 0); }
+          else { do { qd = randInt(101, 999); } while (qd % 10 === 0); }
         } else { // step2
           pb = 2;
           if (wantSmall) { do { db = randInt(12, 99); } while (db % 10 === 0); }   // 0.12〜0.99
@@ -558,12 +771,16 @@
           else qd = randInt(105, 295);
           if (qd % 10 === 0) return null;
         }
-        return makeFromQ(type, db, pb, qd, qp);
+        var made = makeFromQ(type, db, pb, qd, qp);
+        if (!made) return null;
+        if (kind === "intdiv" && made.pa !== 0) return null;
+        if (kind === "intint" && (made.pa !== 0 || made.qp < 1)) return null;
+        return made;
       }
       function buildDeck(type) {
         var problems = [], seen = {};
         function push(kind, wantSmall) {
-          for (var t = 0; t < 80; t++) {
+          for (var t = 0; t < 120; t++) {
             var p = genCandidate(type, kind, wantSmall);
             if (p && !seen[p.expr]) { seen[p.expr] = true; problems.push(p); return; }
           }
@@ -571,15 +788,19 @@
         var i;
         if (type === "review") {
           for (i = 0; i < 10; i++) push("review", false);
-        } else if (type === "basic" || type === "step2") {
-          // わる数が1より小さい型を必ず2問入れる
+        } else if (type === "basic" || type === "step2" || type === "intdiv") {
+          var kind = type;
           var flags = shuffle([true, true, false, false, false, false, false, false, false, false]);
-          for (i = 0; i < 10; i++) push(type, flags[i]);
+          for (i = 0; i < 10; i++) push(kind, flags[i]);
+        } else if (type === "intint") {
+          for (i = 0; i < 10; i++) push("intint", false);
         } else { // mix
-          push("basic", true); push("step2", true);
+          push("intdiv", true); push("basic", true); push("step2", true);
           push("review", false); push("review", false);
-          push("basic", false); push("basic", false); push("basic", false);
-          push("step2", false); push("step2", false); push("step2", false);
+          push("intdiv", false);
+          push("basic", false); push("basic", false);
+          push("step2", false);
+          push("intint", false);
           problems = shuffle(problems);
         }
         return problems;
@@ -597,7 +818,7 @@
       }
 
       /* ================= 画面と進行 ================= */
-      var VIEW_IDS = ["view-top", "view-quiz", "view-result", "view-records"];
+      var VIEW_IDS = ["view-top", "view-quiz", "view-result", "view-records", "view-discover", "view-lesson"];
       function showView(id) {
         VIEW_IDS.forEach(function (v) {
           document.getElementById(v).classList.toggle("hidden", v !== id);
@@ -629,7 +850,9 @@
 
       /* ---------- セッション開始 ---------- */
       function startPractice(type) {
-        session = { mode: "practice", type: type, problems: buildDeck(type), idx: 0, flawless: 0, cleared: 0 };
+        var probs = buildDeck(type);
+        session = { mode: "practice", type: type, problems: probs,
+          items: probs.map(function (p) { return { p: p }; }), idx: 0, flawless: 0, cleared: 0 };
         showView("view-quiz");
         startProblem();
         playSound("start");
@@ -637,31 +860,45 @@
       function startTokkun() {
         var mistakes = loadMistakes();
         if (!mistakes.length) return;
-        var problems = mistakes.map(function (m) {
+        var items = [];
+        mistakes.forEach(function (m) {
+          if (m.qkind && m.qid && QUESTIONS[m.qid]) {
+            var q = {};
+            var srcQ = QUESTIONS[m.qid];
+            for (var k in srcQ) q[k] = srcQ[k];
+            q.qid = m.qid;
+            items.push({ q: q, rec: m });
+            return;
+          }
+          if (typeof m.da !== "number") return;
           var qq = computeQ(m.da, m.pa, m.db, m.pb);
-          return {
+          if (!qq) return;
+          items.push({ p: {
             type: m.type, da: m.da, pa: m.pa, db: m.db, pb: m.pb,
             qd: qq.qd, qp: qq.qp,
             aStr: fmtDec(m.da, m.pa), bStr: fmtDec(m.db, m.pb), qStr: fmtDec(qq.qd, qq.qp),
             expr: m.expr
-          };
+          }, rec: m });
         });
-        session = { mode: "tokkun", type: null, problems: problems, idx: 0, flawless: 0, cleared: 0 };
+        if (!items.length) return;
+        session = { mode: "tokkun", type: null, problems: [], items: items, idx: 0, flawless: 0, cleared: 0 };
         showView("view-quiz");
         startProblem();
         playSound("start");
       }
 
       function startProblem() {
-        var p = session.problems[session.idx];
+        var item = session.items[session.idx];
+        if (item.q) { renderTokkunQuestion(item); return; }
+        var p = item.p;
         var typeDef = TYPES[p.type];
         cur = {
           p: p, naviId: typeDef.naviId, naviName: typeDef.navi,
           phase: "estimate", stageFlags: {}, estimateWrong: false,
           div: null, stepIdx: 0, filledQ: {}, consecErr: 0, shiftDone: false
         };
-        $("progress-label").textContent = (session.idx + 1) + " / " + session.problems.length + " もん";
-        $("progress-fill").style.width = (session.idx / session.problems.length * 100) + "%";
+        $("progress-label").textContent = (session.idx + 1) + " / " + session.items.length + " もん";
+        $("progress-fill").style.width = (session.idx / session.items.length * 100) + "%";
         $("quiz-navi").innerHTML = naviHTML(cur.naviId, "waving",
           (session.mode === "tokkun" ? "とっくん： " : "") + typeDef.label);
         $("problem-text").textContent = p.expr + " ＝ ？";
@@ -711,46 +948,9 @@
       /* ---------- ステップ2：筆算（じゅんび：整数に直す） ---------- */
       function renderHissanPhase() {
         var p = cur.p;
-        if (p.pb > 0 && !cur.shiftDone) { renderShift(); return; }
+        if (p.pb > 0 && !cur.shiftDone) { renderPrep(); return; }
         beginDiv();
       }
-      function renderShift() {
-        var p = cur.p;
-        cur.phase = "shift";
-        setKeypadEnabled(false);
-        var mult = Math.pow(10, p.pb);
-        var html = '<span class="step-label">ステップ2：筆算の じゅんび</span>' +
-          '<div class="step-prompt">わる数 ' + p.bStr + ' を 整数に するために、' + p.aStr + ' と ' + p.bStr + ' を どちらも 何倍する？</div><div class="choices">' +
-          '<button type="button" class="choice-btn" data-shift="10">10倍</button>' +
-          '<button type="button" class="choice-btn" data-shift="100">100倍</button>' +
-          "</div>";
-        $("stage-area").innerHTML = html;
-        setAnswerBox("何倍するか えらぼう", false);
-        if (cur.estMsg) {
-          setFeedback(cur.estMsg.kind, cur.estMsg.verdict, cur.estMsg.body, cur.estMsg.pose);
-          cur.estMsg = null;
-        }
-        document.querySelectorAll("[data-shift]").forEach(function (b) {
-          b.addEventListener("click", function () {
-            var v = Number(b.getAttribute("data-shift"));
-            if (v === mult) {
-              playSound("decide");
-              cur.shiftDone = true;
-              var div = buildDivSteps(p);
-              cur.estMsg = { kind: "good", verdict: "その通り！", pose: "correct",
-                body: "両方を " + mult + "倍すると、" + p.expr + " は " + div.Dstr + " ÷ " + p.db +
-                  " に なるね（答えは 同じ）。小数点が " + p.pb + "けた ずれたことも 見ておこう。" };
-              beginDiv();
-            } else {
-              cur.stageFlags.hissan = true;
-              playSound("wrong");
-              setFeedback("bad", "おしい！",
-                p.bStr + " の 小数点の 右は " + p.pb + " けた。" + p.pb + "けた ずらして 整数に するには、何倍かな？", "retry");
-            }
-          });
-        });
-      }
-
       /* ---------- ステップ2：筆算（わり算） ---------- */
       function beginDiv() {
         var p = cur.p;
@@ -1100,8 +1300,8 @@
         if (flawless) session.flawless++;
         if (session.mode === "tokkun" && flawless) session.cleared++;
         $("btn-next").classList.remove("hidden");
-        $("btn-next").textContent = session.idx + 1 >= session.problems.length ? "けっかへ →" : "つぎへ →";
-        $("progress-fill").style.width = ((session.idx + 1) / session.problems.length * 100) + "%";
+        $("btn-next").textContent = session.idx + 1 >= session.items.length ? "けっかへ →" : "つぎへ →";
+        $("progress-fill").style.width = ((session.idx + 1) / session.items.length * 100) + "%";
       }
       function recordOutcome(flawless) {
         var p = cur.p;
@@ -1135,12 +1335,12 @@
       }
       function nextProblem() {
         session.idx++;
-        if (session.idx >= session.problems.length) showResult();
+        if (session.idx >= session.items.length) showResult();
         else startProblem();
       }
       function showResult() {
         showView("view-result");
-        var n = session.problems.length;
+        var n = session.items.length;
         var mistakes = loadMistakes();
         if (session.mode === "practice") {
           $("result-title").textContent = n + "もん中 " + session.flawless + "もん 手順ノーミス！";
@@ -1163,6 +1363,17 @@
 
       /* ---------- トップ・記録 ---------- */
       function renderTop() {
+        var lgrid = $("lesson-grid");
+        lgrid.innerHTML = "";
+        LESSON_META.forEach(function (meta) {
+          var lbtn = document.createElement("button");
+          lbtn.className = "type-card";
+          lbtn.style.setProperty("--tc", meta.color);
+          lbtn.innerHTML = '<span class="tc-label">' + meta.label + '</span><span class="tc-desc">' + meta.desc +
+            '</span><span class="tc-navi"><span class="navi-avatar" style="width:34px;height:44px;">' + naviImageHTML(meta.naviId, "waving") + "</span>案内：" + meta.navi + "</span>";
+          lbtn.addEventListener("click", function () { startLesson(meta.key); });
+          lgrid.appendChild(lbtn);
+        });
         var grid = $("type-grid");
         grid.innerHTML = "";
         TYPE_KEYS.forEach(function (key) {
@@ -1184,7 +1395,7 @@
         badge.classList.toggle("hidden", n === 0);
         $("btn-tokkun").style.opacity = n === 0 ? ".55" : "1";
       }
-      var STAGE_NAMES = { estimate: "見当", hissan: "筆算", point: "小数点の位置" };
+      var STAGE_NAMES = { estimate: "見当", shift: "倍率", hissan: "筆算", point: "小数点の位置", relation: "関係の理解" };
       function renderRecords() {
         var stats = loadStats();
         var mistakes = loadMistakes();
@@ -1212,7 +1423,880 @@
             "<p>" + t.explain + "</p>";
           grid.appendChild(card);
         });
+        var qMistakes = mistakes.filter(function (m) { return !!m.qkind; });
+        if (qMistakes.length) {
+          var qCounts = {};
+          qMistakes.forEach(function (m) { qCounts[m.qkind] = (qCounts[m.qkind] || 0) + 1; });
+          var qParts = Object.keys(qCounts).map(function (st) { return (STAGE_NAMES[st] || st) + " " + qCounts[st] + "件"; });
+          var qCard = document.createElement("div");
+          qCard.className = "stat-card";
+          qCard.style.setProperty("--tc", "var(--sora)");
+          qCard.innerHTML = "<h3>考え方の問い</h3>" +
+            "<p>とっくん中：<b>" + qMistakes.length + " もん</b>（" + qParts.join("、") + "）</p>" +
+            "<p>発見や レッスンで まちがえた 考え方の問いが 入っています。とっくんで 正解すると きえるよ。</p>";
+          grid.appendChild(qCard);
+        }
         showView("view-records");
+      }
+
+      /* ================= 小数スライダー =================
+         小数点は固定し、数字カードが位取り表の中を移動する。 */
+      function fmtScaled(d, p, s) {
+        var p2 = p - s;
+        if (p2 >= 0) return fmtDec(d, p2);
+        var str = String(d);
+        for (var i = 0; i < -p2; i++) str += "0";
+        return str;
+      }
+      function parseDecStr(s) {
+        if (!s) return null;
+        var m = /^(\d+)(?:\.(\d*))?$/.exec(s);
+        if (!m) return null;
+        var ip = m[1], fp = m[2] || "";
+        if (ip.length + fp.length === 0) return null;
+        return { d: Number(ip + fp), p: fp.length };
+      }
+      function quotientInfo(da, pa, db, pb) {
+        var q = computeQ(da, pa, db, pb);
+        if (q) return { str: fmtDec(q.qd, q.qp), approx: false };
+        var num = da * Math.pow(10, pb), den = db * Math.pow(10, pa);
+        var intPart = Math.floor(num / den), rem = num % den, frac = "";
+        for (var i = 0; i < 3 && rem > 0; i++) {
+          rem *= 10;
+          frac += String(Math.floor(rem / den));
+          rem %= den;
+        }
+        return { str: String(intPart) + (frac ? "." + frac : ""), approx: rem > 0 };
+      }
+      var SL_PLACES = [3, 2, 1, 0, -1, -2, -3];
+      var SL_NAMES = { "3": "1000の位", "2": "100の位", "1": "10の位", "0": "1の位", "-1": "0.1の位", "-2": "0.01の位", "-3": "0.001の位" };
+      function slPlaceLeft(e) {
+        var idx = 3 - e;
+        return idx * 62 + (e < 0 ? 16 : 0);
+      }
+      function createSlider(container) {
+        container.innerHTML = '<div class="slider"><div class="sl-head"></div>' +
+          '<div class="sl-row"><div class="sl-label">割られる数</div><div class="sl-track" data-row="a"></div></div>' +
+          '<div class="sl-row"><div class="sl-label">割る数</div><div class="sl-track" data-row="b"></div></div></div>';
+        var head = container.querySelector(".sl-head");
+        SL_PLACES.forEach(function (e) {
+          var s = document.createElement("span");
+          s.className = "sl-place";
+          s.style.left = slPlaceLeft(e) + "px";
+          s.textContent = SL_NAMES[String(e)];
+          head.appendChild(s);
+        });
+        var tracks = {
+          a: container.querySelector('[data-row="a"]'),
+          b: container.querySelector('[data-row="b"]')
+        };
+        ["a", "b"].forEach(function (r) {
+          var pl = document.createElement("div");
+          pl.className = "sl-point";
+          pl.style.left = (4 * 62 - 2) + "px";
+          tracks[r].appendChild(pl);
+        });
+        var st = { da: 0, pa: 0, db: 0, pb: 0, sa: 0, sb: 0 };
+        function digitsFor(d, p, s) {
+          var str = fmtScaled(d, p, s);
+          var dot = str.indexOf(".");
+          var out = [];
+          for (var j = 0; j < str.length; j++) {
+            if (str[j] === ".") continue;
+            var exp = dot >= 0 ? (dot - 1 - (j < dot ? j : j - 1)) : (str.length - 1 - j);
+            out.push({ ch: str[j], exp: exp });
+          }
+          return out;
+        }
+        function valStr(ch, e) {
+          var n = Number(ch);
+          if (n === 0) return "";
+          if (e >= 0) return String(n * Math.pow(10, e));
+          return fmtDec(n, -e);
+        }
+        function drawRow(track, d, p, s, cls) {
+          var digs = digitsFor(d, p, s);
+          var cards = track.querySelectorAll(".sl-digit");
+          var vals = track.querySelectorAll(".sl-val");
+          var need = digs.length;
+          while (cards.length < need) {
+            var c = document.createElement("div");
+            c.className = "sl-digit " + cls;
+            track.appendChild(c);
+            var v = document.createElement("div");
+            v.className = "sl-val";
+            track.appendChild(v);
+            cards = track.querySelectorAll(".sl-digit");
+            vals = track.querySelectorAll(".sl-val");
+          }
+          digs.forEach(function (dg, i) {
+            var c = cards[i], v = vals[i];
+            c.style.display = "";
+            v.style.display = "";
+            c.textContent = dg.ch;
+            c.style.left = slPlaceLeft(dg.exp) + "px";
+            v.textContent = valStr(dg.ch, dg.exp);
+            v.style.left = slPlaceLeft(dg.exp) + "px";
+          });
+          for (var i = digs.length; i < cards.length; i++) {
+            cards[i].style.display = "none";
+            vals[i].style.display = "none";
+          }
+        }
+        function draw() {
+          drawRow(tracks.a, st.da, st.pa, st.sa, "a-num");
+          drawRow(tracks.b, st.db, st.pb, st.sb, "b-num");
+        }
+        return {
+          setNumbers: function (da, pa, db, pb) {
+            st.da = da; st.pa = pa; st.db = db; st.pb = pb;
+            st.sa = 0; st.sb = 0;
+            draw();
+          },
+          resetShifts: function () { st.sa = 0; st.sb = 0; draw(); },
+          apply: function (target, delta) {
+            var nsa = st.sa + (target === "a" || target === "both" ? delta : 0);
+            var nsb = st.sb + (target === "b" || target === "both" ? delta : 0);
+            var all = digitsFor(st.da, st.pa, nsa).concat(digitsFor(st.db, st.pb, nsb));
+            for (var i = 0; i < all.length; i++) {
+              if (all[i].exp > 3 || all[i].exp < -3) return false;
+            }
+            st.sa = nsa; st.sb = nsb;
+            draw();
+            return true;
+          },
+          getState: function () { return { sa: st.sa, sb: st.sb }; },
+          numbers: function () { return { da: st.da, pa: st.pa, db: st.db, pb: st.pb }; }
+        };
+      }
+
+      /* ================= 考え方の問い（特訓と共通） ================= */
+      var QUESTIONS = {
+        "lessonB-shift": {
+          cat: "shift",
+          text: "0.3 を 整数に するには、割られる数と 割る数を どちらも 何倍する？",
+          choices: ["10倍", "100倍", "2倍"], correct: 0,
+          explain: "0.3は 小数第1位までの 数。1けた 分 大きくする＝10倍で 整数に なるね。"
+        },
+        "lessonC-shift": {
+          cat: "shift",
+          text: "1.2 を 整数に するには、割られる数と 割る数を どちらも 何倍する？",
+          choices: ["10倍", "100倍", "5倍"], correct: 0,
+          explain: "1.2も 小数第1位まで。10倍で 整数に なるね。第2位までの 数なら 100倍だよ。"
+        },
+        "lessonA-q": {
+          cat: "relation",
+          text: "4.8 ÷ 2 は、0.1の 個数で 考えると 48 ÷ 2。では 6.9 ÷ 3 は、0.1が 何個を 3で わる 計算？",
+          choices: ["69個", "23個", "6.9個"], correct: 0,
+          explain: "6.9は 0.1が 69個。その 69個を 3で わるよ。答えは 23個の 0.1＝2.3だね。"
+        },
+        "lessonB-q": {
+          cat: "relation",
+          text: "6 ÷ 0.3 の 答えは 20。割る数だけを 10倍して 6 ÷ 3 にすると、答えは どうなる？",
+          choices: ["もとの 答えと 同じ", "もとの 答えより 小さくなる", "もとの 答えより 大きくなる"], correct: 1,
+          explain: "割る数だけ 大きくすると、答えは 小さくなるよ。6 ÷ 3 ＝ 2 で、20の 10分の1に なったね。"
+        },
+        "lessonC-q": {
+          cat: "relation",
+          text: "3.6 ÷ 1.2 で、割られる数も 10倍するのは、なぜ？",
+          choices: ["両方を 同じ倍率にすると、何倍かの 関係が 変わらないから", "小数点を 消すため だけ", "そう 決まっているから"], correct: 0,
+          explain: "大事なのは、何倍かの 関係が 変わらないこと。小数点が 消えて 計算しやすく なるのは、その 結果だよ。"
+        },
+        "lessonD-q": {
+          cat: "relation",
+          text: "5 ÷ 2 ＝ 2 あまり 1。あまりの 1を さらに 分けると、答えは どうなる？",
+          choices: ["2.5に なる", "2のまま", "3に なる"], correct: 0,
+          explain: "あまり1は 0.1が 10個。2つに 分けると 5個ずつ＝0.5。2と 合わせて 2.5だよ。"
+        },
+        "disc-m1": {
+          cat: "relation",
+          text: "割る数だけ 10倍すると、答えは どうなる？",
+          choices: ["答えは 同じ", "答えは 10倍に なる", "答えは 10分の1に なる"], correct: 2,
+          explain: "6 ÷ 0.3 ＝ 20。割る数だけ 10倍すると 6 ÷ 3 ＝ 2。答えは 10分の1に なったね。"
+        },
+        "disc-m2": {
+          cat: "relation",
+          text: "割られる数だけ 10倍すると、答えは どうなる？",
+          choices: ["答えは 同じ", "答えは 10倍に なる", "答えは 10分の1に なる"], correct: 1,
+          explain: "3.6 ÷ 1.2 ＝ 3。割られる数だけ 10倍すると 36 ÷ 1.2 ＝ 30。答えは 10倍に なったね。"
+        },
+        "disc-m3": {
+          cat: "relation",
+          text: "両方を 100倍しても、答えは 変わらない？",
+          choices: ["変わらない", "100倍に なる", "100分の1に なる"], correct: 0,
+          explain: "0.75 ÷ 0.25 ＝ 3。両方を 100倍すると 75 ÷ 25 ＝ 3。答えは 変わらなかったね。"
+        },
+        "disc-m4": {
+          cat: "relation",
+          text: "0.4 ÷ 2 の答えは、2より 大きい？ 小さい？",
+          choices: ["2より 大きい", "2より 小さい"], correct: 1,
+          explain: "0.4 ÷ 2 ＝ 0.2。2より 小さいね。0.4は 0.1が 4個、それを 2つに 分けると 2個ずつ＝0.2だよ。"
+        }
+      };
+      function recordQuestionMistake(qid) {
+        var q = QUESTIONS[qid];
+        if (!q) return;
+        var mistakes = loadMistakes();
+        for (var i = 0; i < mistakes.length; i++) {
+          if (mistakes[i].qid === qid) return;
+        }
+        mistakes.push({ qkind: q.cat, qid: qid, expr: q.text, stages: [q.cat] });
+        saveJSON(LS_MISTAKES, mistakes);
+        renderTokkunBadge();
+      }
+      function clearQuestionMistake(qid) {
+        var mistakes = loadMistakes();
+        var next = mistakes.filter(function (m) { return m.qid !== qid; });
+        if (next.length !== mistakes.length) {
+          saveJSON(LS_MISTAKES, next);
+          renderTokkunBadge();
+        }
+      }
+
+      /* ---------- ステップ2：じゅんび（小数スライダー） ---------- */
+      function renderPrep() {
+        var p = cur.p;
+        cur.phase = "prep";
+        setKeypadEnabled(false);
+        var html = '<span class="step-label">ステップ2：筆算の じゅんび</span>' +
+          '<div class="step-prompt">小数スライダーで、割る数 ' + p.bStr + ' が 整数に なるまで、両方の 数を 大きくしよう。</div>' +
+          '<div class="eq-line" id="prep-eq"></div><div id="prep-slider"></div>' +
+          '<div class="sl-controls">' +
+          '<button type="button" class="sl-btn" id="prep-x10">×10</button>' +
+          '<button type="button" class="sl-btn" id="prep-x100">×100</button>' +
+          '<button type="button" class="sl-btn sub" id="prep-d10">÷10</button>' +
+          '<button type="button" class="sl-btn" id="prep-go" disabled>筆算を はじめる</button>' +
+          "</div>";
+        $("stage-area").innerHTML = html;
+        setAnswerBox("スライダーで 大きくしよう", false);
+        if (cur.estMsg) {
+          setFeedback(cur.estMsg.kind, cur.estMsg.verdict, cur.estMsg.body, cur.estMsg.pose);
+          cur.estMsg = null;
+        }
+        var slider = createSlider($("prep-slider"));
+        slider.setNumbers(p.da, p.pa, p.db, p.pb);
+        cur.prepSlider = slider;
+        function refresh() {
+          var s = slider.getState().sa;
+          var curA = fmtScaled(p.da, p.pa, s), curB = fmtScaled(p.db, p.pb, s);
+          $("prep-eq").innerHTML = p.expr + ' <span class="eq-arrow">→</span> ' + curA + " ÷ " + curB +
+            ' <span class="same-chip">答えは 同じ</span>';
+          $("prep-x10").disabled = s >= p.pb;
+          $("prep-x100").disabled = s + 2 > p.pb;
+          $("prep-d10").disabled = s <= 0;
+          $("prep-go").disabled = s !== p.pb;
+          if (s === p.pb) {
+            setAnswerBox("「筆算を はじめる」を 押そう", true);
+            setFeedback("good", "割る数が 整数に なった！",
+              p.expr + " は " + curA + " ÷ " + curB + " に なったね。両方を 同じだけ 大きくしたから、答えは 同じだよ。", "correct");
+          }
+        }
+        $("prep-x10").addEventListener("click", function () {
+          if (slider.apply("both", 1)) { playSound("click"); refresh(); }
+        });
+        $("prep-x100").addEventListener("click", function () {
+          if (slider.apply("both", 2)) { playSound("click"); refresh(); }
+        });
+        $("prep-d10").addEventListener("click", function () {
+          if (slider.apply("both", -1)) { playSound("click"); refresh(); }
+        });
+        $("prep-go").addEventListener("click", function () {
+          playSound("decide");
+          cur.shiftDone = true;
+          var div = buildDivSteps(p);
+          cur.estMsg = { kind: "good", verdict: "その通り！", pose: "correct",
+            body: "両方を " + Math.pow(10, p.pb) + "倍すると、" + p.expr + " は " + div.Dstr + " ÷ " + p.db +
+              " に なるね（答えは 同じ）。" };
+          beginDiv();
+        });
+        refresh();
+      }
+
+      /* ---------- とっくん：考え方の問い ---------- */
+      function renderTokkunQuestion(item) {
+        var q = item.q;
+        cur = { p: null, q: q, naviId: "sora", naviName: "そら", phase: "question", qWrong: 0 };
+        $("progress-label").textContent = (session.idx + 1) + " / " + session.items.length + " もん";
+        $("progress-fill").style.width = (session.idx / session.items.length * 100) + "%";
+        $("quiz-navi").innerHTML = naviHTML("sora", "waving", "とっくん：考え方の問い");
+        $("problem-text").textContent = "考え方の 問い";
+        $("btn-next").classList.add("hidden");
+        setKeypadEnabled(false);
+        var html = '<span class="step-label">とっくん：考え方の問い</span>' +
+          '<div class="step-prompt">' + q.text + '</div><div class="choices">' +
+          q.choices.map(function (c, i) {
+            return '<button type="button" class="choice-btn" data-qc="' + i + '">' + c + "</button>";
+          }).join("") + "</div>";
+        $("stage-area").innerHTML = html;
+        setAnswerBox("答えを えらぼう", false);
+        setFeedback("", "", "前に まちがえた 問いだよ。思い出して 考えてみよう。", "hint");
+        document.querySelectorAll("[data-qc]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            var i = Number(b.getAttribute("data-qc"));
+            if (i === q.correct) {
+              playSound("correct");
+              clearQuestionMistake(q.qid);
+              session.cleared++;
+              document.querySelectorAll("[data-qc]").forEach(function (x) { x.disabled = true; });
+              b.classList.add("picked");
+              setFeedback("good", "せいかい！", q.explain, "correct");
+              setAnswerBox("考え方の問い クリア！", true);
+              $("btn-next").classList.remove("hidden");
+              $("btn-next").textContent = session.idx + 1 >= session.items.length ? "けっかへ →" : "つぎへ →";
+              $("progress-fill").style.width = ((session.idx + 1) / session.items.length * 100) + "%";
+            } else {
+              cur.qWrong++;
+              playSound("wrong");
+              setFeedback("bad", "おしい！",
+                cur.qWrong >= 2 ? q.explain + " もう一度 えらんでみよう。" : "もう一度 考えて みよう。", "retry");
+            }
+          });
+        });
+      }
+
+      /* ================= うごかして発見 ================= */
+      var DISCOVERY_MISSIONS = [
+        { id: "disc-m1", a: "6", b: "0.3", target: "b", label: "割る数だけ 10倍すると？" },
+        { id: "disc-m2", a: "3.6", b: "1.2", target: "a", label: "割られる数だけ 10倍すると？" },
+        { id: "disc-m3", a: "0.75", b: "0.25", target: "both", label: "両方を 100倍しても？" },
+        { id: "disc-m4", a: "0.4", b: "2", target: null, label: "0.4 ÷ 2 の 見当" }
+      ];
+      var disc = null;
+      function setDiscFeedback(kind, verdict, body, pose) {
+        var fb = $("disc-feedback");
+        fb.className = "feedback" + (kind ? " " + kind : "");
+        $("disc-feedback-navi").innerHTML = '<span class="navi-avatar">' + naviImageHTML("sora", pose || "hint") + "</span>";
+        $("disc-verdict").textContent = verdict || "";
+        $("disc-feedback-body").innerHTML = body || "";
+      }
+      function startDiscover() {
+        disc = {
+          aStr: "3.6", bStr: "1.2", sel: "a", target: "both",
+          missionId: null, missionOps: {}, missionDone: {}, slider: null
+        };
+        showView("view-discover");
+        $("disc-navi").innerHTML = naviHTML("sora", "waving", "うごかして発見：小数スライダー");
+        disc.slider = createSlider($("disc-slider"));
+        renderMissionList();
+        renderMissionArea();
+        syncDiscover();
+        setDiscFeedback("", "", "数を えらんで、×10ボタンを 押して みよう。数字が 位を うごくよ。両方を 同じだけ 大きくすると、答えは どうなるかな？", "hint");
+        playSound("start");
+      }
+      function discParsed() {
+        return { A: parseDecStr(disc.aStr), B: parseDecStr(disc.bStr) };
+      }
+      function syncDiscover() {
+        $("nf-a-val").textContent = disc.aStr === "" ? "　" : disc.aStr;
+        $("nf-b-val").textContent = disc.bStr === "" ? "　" : disc.bStr;
+        $("nf-a").classList.toggle("on", disc.sel === "a");
+        $("nf-b").classList.toggle("on", disc.sel === "b");
+        var n = discParsed();
+        if (n.A && n.B && n.B.d !== 0) {
+          disc.slider.setNumbers(n.A.d, n.A.p, n.B.d, n.B.p);
+        }
+        renderDiscEq();
+      }
+      function renderDiscEq() {
+        var n = discParsed();
+        var el = $("disc-eq");
+        if (!n.A || !n.B || n.B.d === 0) {
+          el.innerHTML = '<span style="color:var(--muted);font-size:17px;">数を 入れると、式と 答えが 出るよ</span>';
+          return;
+        }
+        var st = disc.slider.getState();
+        var origQ = quotientInfo(n.A.d, n.A.p, n.B.d, n.B.p);
+        var curA = fmtScaled(n.A.d, n.A.p, st.sa), curB = fmtScaled(n.B.d, n.B.p, st.sb);
+        var curQ = quotientInfo(n.A.d, n.A.p - st.sa, n.B.d, n.B.p - st.sb);
+        var origExpr = fmtDec(n.A.d, n.A.p) + " ÷ " + fmtDec(n.B.d, n.B.p);
+        var curExpr = curA + " ÷ " + curB;
+        var chip;
+        if (st.sa === st.sb) {
+          chip = '<span class="same-chip">答えは ' + (origQ.approx ? "約" : "") + origQ.str + " のまま</span>";
+        } else {
+          chip = '<span class="diff-chip">答えが 変わった！ ' + (origQ.approx ? "約" : "") + origQ.str +
+            " → " + (curQ.approx ? "約" : "") + curQ.str + "</span>";
+        }
+        el.innerHTML = origExpr + ' <span class="eq-arrow">→</span> ' + curExpr + " " + chip;
+      }
+      function discApply(delta) {
+        if (!disc.slider.apply(disc.target, delta)) {
+          setDiscFeedback("bad", "ストップ", "これ以上 うごかすと、位取り表から はみ出して しまうよ。", "retry");
+          return;
+        }
+        playSound("click");
+        disc.missionOps[disc.target] = true;
+        renderDiscEq();
+        refreshMissionChoices();
+      }
+      function discKey(k) {
+        var curStr = disc.sel === "a" ? disc.aStr : disc.bStr;
+        var next;
+        if (k === "del") next = curStr.slice(0, -1);
+        else if (k === ".") {
+          if (curStr.indexOf(".") >= 0) return;
+          next = (curStr === "" ? "0" : curStr) + ".";
+        } else {
+          next = curStr + k;
+        }
+        if (next !== "" && !/^\d{0,2}(\.\d{0,2})?$/.test(next)) return;
+        if (disc.sel === "a") disc.aStr = next; else disc.bStr = next;
+        if (disc.missionId) {
+          disc.missionId = null;
+          renderMissionList();
+          renderMissionArea();
+        }
+        syncDiscover();
+      }
+      function renderMissionList() {
+        var list = $("mission-list");
+        list.innerHTML = "";
+        DISCOVERY_MISSIONS.forEach(function (m) {
+          var q = QUESTIONS[m.id];
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "mission-item" +
+            (disc.missionDone[m.id] ? " done" : "") +
+            (disc.missionId === m.id ? " on" : "");
+          btn.textContent = (disc.missionDone[m.id] ? "✓ " : "") + m.label;
+          btn.addEventListener("click", function () { selectMission(m.id); });
+          list.appendChild(btn);
+        });
+      }
+      function selectMission(id) {
+        var m = null;
+        DISCOVERY_MISSIONS.forEach(function (x) { if (x.id === id) m = x; });
+        if (!m) return;
+        disc.missionId = id;
+        disc.aStr = m.a; disc.bStr = m.b;
+        disc.target = m.target || "both";
+        disc.missionOps = {};
+        document.querySelectorAll("#disc-target button").forEach(function (b) {
+          b.classList.toggle("on", b.getAttribute("data-tg") === disc.target);
+        });
+        renderMissionList();
+        syncDiscover();
+        renderMissionArea();
+        setDiscFeedback("", "", "ミッションの 式を セットしたよ。まず スライダーを うごかして、答えが どうなるか 見てみよう。", "hint");
+      }
+      function missionReady() {
+        if (!disc.missionId) return false;
+        var m = null;
+        DISCOVERY_MISSIONS.forEach(function (x) { if (x.id === disc.missionId) m = x; });
+        if (!m || !m.target) return true;
+        return !!disc.missionOps[m.target];
+      }
+      function renderMissionArea() {
+        var area = $("mission-area");
+        if (!disc.missionId) { area.innerHTML = ""; return; }
+        var q = QUESTIONS[disc.missionId];
+        var ready = missionReady();
+        area.innerHTML = '<div class="ask-box"><div class="step-prompt">' + q.text + '</div>' +
+          '<div class="choices">' + q.choices.map(function (c, i) {
+            return '<button type="button" class="choice-btn" data-mc="' + i + '"' + (ready ? "" : " disabled") + ">" + c + "</button>";
+          }).join("") + "</div>" +
+          (ready ? "" : '<div class="ask-note">まず スライダーを うごかしてから 答えよう</div>') + "</div>";
+        area.querySelectorAll("[data-mc]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            var i = Number(b.getAttribute("data-mc"));
+            if (i === q.correct) {
+              playSound("correct");
+              disc.missionDone[disc.missionId] = true;
+              clearQuestionMistake(disc.missionId);
+              setDiscFeedback("good", "発見できた！", q.explain, "correct");
+              renderMissionList();
+              area.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+              b.classList.add("picked");
+            } else {
+              playSound("wrong");
+              recordQuestionMistake(disc.missionId);
+              setDiscFeedback("bad", "おしい！", "スライダーの 答えの 変化を、もう一度 見てみよう。", "retry");
+            }
+          });
+        });
+      }
+      function refreshMissionChoices() {
+        if (!disc.missionId) return;
+        if (!missionReady()) return;
+        var area = $("mission-area");
+        var note = area.querySelector(".ask-note");
+        if (note) renderMissionArea();
+      }
+
+      /* ================= しくみを理解（レッスン） ================= */
+      var LESSON_META = [
+        { key: "A", label: "小数 ÷ 整数", desc: "4.8 ÷ 2 を、0.1の 個数で 考えよう", navi: "りく", naviId: "riku", color: "var(--riku)" },
+        { key: "B", label: "整数 ÷ 小数", desc: "6 ÷ 0.3 は、0.1が 何個分 あるかな", navi: "なみ", naviId: "nami", color: "var(--nami)" },
+        { key: "C", label: "小数 ÷ 小数", desc: "3.6 ÷ 1.2。両方を 大きくしても 答えは 同じ", navi: "つき", naviId: "tsuki", color: "var(--tsuki)" },
+        { key: "D", label: "整数 ÷ 整数（発展）", desc: "5 ÷ 2。あまりを 分けると 小数の 答えに なる", navi: "さく", naviId: "saku", color: "var(--saku)" }
+      ];
+      var lesson = null;
+      function lessonMeta(key) {
+        for (var i = 0; i < LESSON_META.length; i++) if (LESSON_META[i].key === key) return LESSON_META[i];
+        return LESSON_META[0];
+      }
+      function setLessonFeedback(kind, verdict, body, pose) {
+        var fb = $("lesson-feedback");
+        fb.className = "feedback" + (kind ? " " + kind : "");
+        var meta = lesson ? lessonMeta(lesson.key) : LESSON_META[0];
+        $("lesson-feedback-navi").innerHTML = '<span class="navi-avatar">' + naviImageHTML(meta.naviId, pose || "hint") + "</span>";
+        $("lesson-verdict").textContent = verdict || "";
+        $("lesson-feedback-body").innerHTML = body || "";
+      }
+      function lessonNext(label, fn) {
+        var b = $("btn-lesson-next");
+        if (!fn) {
+          b.classList.add("hidden");
+          b.onclick = null;
+          return;
+        }
+        b.textContent = label || "つぎへ →";
+        b.classList.remove("hidden");
+        b.onclick = function () { playSound("decide"); fn(); };
+      }
+      function lessonProgress(i, n) {
+        $("lesson-progress").textContent = (i + 1) + " / " + n;
+        $("lesson-fill").style.width = (i / n * 100) + "%";
+      }
+      function startLesson(key) {
+        lesson = { key: key };
+        showView("view-lesson");
+        var meta = lessonMeta(key);
+        $("lesson-navi").innerHTML = naviHTML(meta.naviId, "waving", "しくみを理解：" + meta.label);
+        var scenes = { A: lessonAScenes, B: lessonBScenes, C: lessonCScenes, D: lessonDScenes }[key]();
+        lesson.scenes = scenes;
+        lesson.idx = 0;
+        runLessonScene();
+        playSound("start");
+      }
+      function runLessonScene() {
+        lessonProgress(lesson.idx, lesson.scenes.length);
+        lessonNext(null);
+        lesson.scenes[lesson.idx]();
+      }
+      function gotoScene(i) {
+        lesson.idx = i;
+        runLessonScene();
+      }
+      function lessonFinishScene(title, body) {
+        var meta = lessonMeta(lesson.key);
+        $("lesson-stage").innerHTML = '<div class="big-expr">' + title + "</div>" +
+          '<div class="summary-box">' + body + "</div>";
+        setLessonFeedback("good", "しくみが つかめたね！", meta.label + " の しくみは バッチリ。このあと「計算に挑戦」で 練習してみよう。", "complete");
+        lessonNext("トップへ もどる", function () { renderTop(); showView("view-top"); });
+      }
+      function lessonEstimate(aStr, bStr, small, onDone) {
+        var stage = $("lesson-stage");
+        var box = document.createElement("div");
+        box.className = "ask-box";
+        box.innerHTML = '<div class="step-prompt">まずは 見当：答えは ' + aStr + " より 大きくなる？ 小さくなる？（割る数 " + bStr + " に 注目）</div>" +
+          '<div class="choices">' +
+          '<button type="button" class="choice-btn" data-le="up">' + aStr + " より 大きくなる</button>" +
+          '<button type="button" class="choice-btn" data-le="down">' + aStr + " より 小さくなる</button></div>";
+        stage.appendChild(box);
+        box.querySelectorAll("[data-le]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            var choseUp = b.getAttribute("data-le") === "up";
+            if (choseUp === small) {
+              playSound("correct");
+              setLessonFeedback("good", "いい見当！",
+                "割る数 " + bStr + " は 1より " + (small ? "小さい" : "大きい") + "から、答えは " + aStr + " より " + (small ? "大きく" : "小さく") + " なるね。", "correct");
+              box.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+              b.classList.add("picked");
+              onDone();
+            } else {
+              playSound("wrong");
+              setLessonFeedback("bad", "おしい！",
+                "割る数 " + bStr + " は 1より " + (small ? "小さい" : "大きい") + "数。1より " + (small ? "小さい" : "大きい") +
+                "数で わると、答えは もとの数より " + (small ? "大きく" : "小さく") + " なるよ。", "retry");
+            }
+          });
+        });
+      }
+      function lessonAsk(qid, onDone) {
+        var q = QUESTIONS[qid];
+        var stage = $("lesson-stage");
+        var box = document.createElement("div");
+        box.className = "ask-box";
+        box.innerHTML = '<div class="step-prompt">確かめる問い：' + q.text + '</div><div class="choices">' +
+          q.choices.map(function (c, i) {
+            return '<button type="button" class="choice-btn" data-lq="' + i + '">' + c + "</button>";
+          }).join("") + "</div>";
+        stage.appendChild(box);
+        var wrongs = 0;
+        box.querySelectorAll("[data-lq]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            var i = Number(b.getAttribute("data-lq"));
+            if (i === q.correct) {
+              playSound("correct");
+              clearQuestionMistake(qid);
+              setLessonFeedback("good", "せいかい！", q.explain, "correct");
+              box.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+              b.classList.add("picked");
+              onDone();
+            } else {
+              wrongs++;
+              playSound("wrong");
+              recordQuestionMistake(qid);
+              setLessonFeedback("bad", "おしい！", wrongs >= 2 ? q.explain + " もう一度 えらんでみよう。" : "もう一度 考えて みよう。", "retry");
+            }
+          });
+        });
+      }
+      function cellsHTML(n, cols, clsFn) {
+        var html = '<div class="cells" style="grid-template-columns: repeat(' + cols + ', 1fr);">';
+        for (var i = 0; i < n; i++) html += '<div class="cell01 ' + clsFn(i) + '"></div>';
+        html += "</div>";
+        return html;
+      }
+
+      /* ---------- レッスンA：小数 ÷ 整数（4.8 ÷ 2） ---------- */
+      function lessonAScenes() {
+        return [
+          function () {
+            $("lesson-stage").innerHTML = '<div class="big-expr">4.8 ÷ 2</div>' +
+              '<div class="step-prompt" style="text-align:center;">小数 ÷ 整数は、0.1の 個数で 考えると 見えてくるよ。</div>';
+            setLessonFeedback("", "", "りく だよ。4.8 ÷ 2 の しくみを つかもう。まずは 見当から。", "hint");
+            lessonEstimate("4.8", "2", false, function () {
+              lessonNext("つぎへ →", function () { gotoScene(1); });
+            });
+          },
+          function () {
+            $("lesson-stage").innerHTML = '<div class="big-expr">4.8 ＝ 0.1が 48個</div>' +
+              cellsHTML(48, 12, function () { return "on"; }) +
+              '<div class="model-note">4.8は、0.1が 48個 集まった 数だね。</div>' +
+              '<div class="model-btn-row"><button type="button" class="sl-btn" id="btn-split-a">2つに 分けてみる</button></div>' +
+              '<div class="model-note" id="a-split-note"></div>';
+            setLessonFeedback("", "", "48個の 0.1を、2つに 分けて みよう。", "hint");
+            $("btn-split-a").addEventListener("click", function () {
+              playSound("decide");
+              var cells = $("lesson-stage").querySelectorAll(".cell01");
+              cells.forEach(function (c, i) { if (i >= 24) c.className = "cell01 g2"; });
+              $("a-split-note").innerHTML = "24個ずつに 分かれたね。24個の 0.1は <b>2.4</b>。だから 4.8 ÷ 2 ＝ <b>2.4</b>。";
+              $("btn-split-a").disabled = true;
+              setLessonFeedback("good", "見えた！", "48 ÷ 2 ＝ 24。0.1の 個数で わり算が できたね。", "correct");
+              lessonNext("つぎへ →", function () { gotoScene(2); });
+            });
+          },
+          function () {
+            $("lesson-stage").innerHTML = '<div class="summary-box">4.8 ÷ 2 は、0.1の 個数で 考えると <b>48 ÷ 2 ＝ 24</b>。<br>24個の 0.1 ＝ <b>2.4</b></div>';
+            setLessonFeedback("", "", "まとめの あとは、確かめる問いだよ。", "hint");
+            lessonAsk("lessonA-q", function () {
+              lessonNext("つぎへ →", function () { gotoScene(3); });
+            });
+          },
+          function () {
+            lessonFinishScene("4.8 ÷ 2 ＝ 2.4", "小数 ÷ 整数は、<b>0.1が 何個か</b> で 考えると、整数の わり算に なる。");
+          }
+        ];
+      }
+
+      /* ---------- レッスンB：整数 ÷ 小数（6 ÷ 0.3） ---------- */
+      function lessonBScenes() {
+        return [
+          function () {
+            $("lesson-stage").innerHTML = '<div class="big-expr">6 ÷ 0.3</div>' +
+              '<div class="step-prompt" style="text-align:center;">整数 ÷ 小数は、「0.1が 何個分 あるか」で 考えよう。</div>';
+            setLessonFeedback("", "", "なみ だよ。6 ÷ 0.3 の しくみを つかもう。まずは 見当から。", "hint");
+            lessonEstimate("6", "0.3", true, function () {
+              lessonNext("つぎへ →", function () { gotoScene(1); });
+            });
+          },
+          function () {
+            $("lesson-stage").innerHTML = '<div class="step-prompt" style="text-align:center;">0.3を 整数に する 考え方を、まず 予想しよう。</div>';
+            setLessonFeedback("", "", "割る数を 整数に するには、何倍が いるかな？", "hint");
+            lessonAsk("lessonB-shift", function () {
+              lessonNext("つぎへ →", function () { gotoScene(2); });
+            });
+          },
+          function () {
+            $("lesson-stage").innerHTML = '<div class="big-expr">6 ＝ 0.1が 60個、0.3 ＝ 0.1が 3個</div>' +
+              cellsHTML(60, 15, function () { return "on"; }) +
+              '<div class="model-note">6 ÷ 0.3 は、「60個の 中に 3個の かたまりが 何個分 あるか」だね。</div>' +
+              '<div class="model-btn-row"><button type="button" class="sl-btn" id="btn-group-b">3個ずつに 分けてみる</button></div>' +
+              '<div class="model-note" id="b-group-note"></div>';
+            setLessonFeedback("", "", "3個ずつの かたまりに 分けて、数えて みよう。", "hint");
+            $("btn-group-b").addEventListener("click", function () {
+              playSound("decide");
+              var cells = $("lesson-stage").querySelectorAll(".cell01");
+              cells.forEach(function (c, i) {
+                c.className = "cell01 " + (Math.floor(i / 3) % 2 === 0 ? "ga" : "gb");
+              });
+              $("b-group-note").innerHTML = "3個の かたまりが <b>20個</b> できた。だから 6 ÷ 0.3 ＝ <b>20</b>。";
+              $("btn-group-b").disabled = true;
+              setLessonFeedback("good", "見えた！", "60 ÷ 3 ＝ 20。0.1の 個数で 考えると、整数の わり算に なったね。", "correct");
+              lessonNext("つぎへ →", function () { gotoScene(3); });
+            });
+          },
+          function () {
+            $("lesson-stage").innerHTML = '<div class="step-prompt" style="text-align:center;">スライダーでも 確かめよう。×10を 押して みよう。</div>' +
+              '<div class="eq-line" id="lesb-eq"></div><div id="lesb-slider"></div>' +
+              '<div class="sl-controls">' +
+              '<button type="button" class="sl-btn" id="lesb-x10">×10</button>' +
+              '<button type="button" class="sl-btn sub" id="lesb-d10">÷10</button></div>';
+            setLessonFeedback("", "", "両方を 10倍すると、60 ÷ 3 に なるよ。答えは どうなるかな？", "hint");
+            var slider = createSlider($("lesb-slider"));
+            slider.setNumbers(6, 0, 3, 1);
+            function refresh() {
+              var s = slider.getState().sa;
+              $("lesb-eq").innerHTML = "6 ÷ 0.3" + (s > 0
+                ? ' <span class="eq-arrow">→</span> 60 ÷ 3 <span class="same-chip">答えは 20 のまま</span>'
+                : ' <span class="same-chip">答えは 20</span>');
+              if (s >= 1) {
+                setLessonFeedback("good", "その通り！", "60 ÷ 3 ＝ 20。さっきの 0.1の 個数の 考え方と 同じに なったね。", "correct");
+                lessonNext("つぎへ →", function () { gotoScene(4); });
+              }
+            }
+            $("lesb-x10").addEventListener("click", function () {
+              if (slider.apply("both", 1)) { playSound("click"); refresh(); }
+            });
+            $("lesb-d10").addEventListener("click", function () {
+              if (slider.apply("both", -1)) { playSound("click"); refresh(); }
+            });
+            refresh();
+          },
+          function () {
+            $("lesson-stage").innerHTML = '<div class="summary-box">6 ÷ 0.3 は、両方を <b>10倍</b>すると <b>60 ÷ 3 ＝ 20</b>。<br>0.1の 個数で 考えても、同じ 答えに なる。</div>';
+            setLessonFeedback("", "", "まとめの あとは、確かめる問いだよ。", "hint");
+            lessonAsk("lessonB-q", function () {
+              lessonNext("つぎへ →", function () { gotoScene(5); });
+            });
+          },
+          function () {
+            lessonFinishScene("6 ÷ 0.3 ＝ 20", "整数 ÷ 小数は、<b>0.1が 何個分</b>。両方を 10倍すると 整数の わり算に なる。");
+          }
+        ];
+      }
+
+      /* ---------- レッスンC：小数 ÷ 小数（3.6 ÷ 1.2） ---------- */
+      function lessonCScenes() {
+        return [
+          function () {
+            $("lesson-stage").innerHTML = '<div class="big-expr">3.6 ÷ 1.2</div>' +
+              '<div class="step-prompt" style="text-align:center;">小数 ÷ 小数の 核は、「両方を 同じ倍率にしても 関係は 変わらない」こと。</div>';
+            setLessonFeedback("", "", "つき だよ。3.6 ÷ 1.2 の しくみを つかもう。まずは 見当から。", "hint");
+            lessonEstimate("3.6", "1.2", false, function () {
+              lessonNext("つぎへ →", function () { gotoScene(1); });
+            });
+          },
+          function () {
+            $("lesson-stage").innerHTML = '<div class="step-prompt" style="text-align:center;">1.2を 整数に する 考え方を、まず 予想しよう。</div>';
+            setLessonFeedback("", "", "割る数を 整数に するには、何倍が いるかな？", "hint");
+            lessonAsk("lessonC-shift", function () {
+              lessonNext("つぎへ →", function () { gotoScene(2); });
+            });
+          },
+          function () {
+            $("lesson-stage").innerHTML = '<div class="step-prompt" style="text-align:center;">スライダーを うごかして、答えが 変わるか 確かめよう。×100まで 試して いいよ。</div>' +
+              '<div class="eq-line" id="lesc-eq"></div><div id="lesc-slider"></div>' +
+              '<div class="sl-controls">' +
+              '<button type="button" class="sl-btn" id="lesc-x10">×10</button>' +
+              '<button type="button" class="sl-btn" id="lesc-x100">×100</button>' +
+              '<button type="button" class="sl-btn sub" id="lesc-d10">÷10</button></div>';
+            setLessonFeedback("", "", "数字が 位を うごく様子を、よく 見てね。小数点は 動かないよ。", "hint");
+            var slider = createSlider($("lesc-slider"));
+            slider.setNumbers(36, 1, 12, 1);
+            var tried = false;
+            function refresh() {
+              var s = slider.getState().sa;
+              var curA = fmtScaled(36, 1, s), curB = fmtScaled(12, 1, s);
+              $("lesc-eq").innerHTML = "3.6 ÷ 1.2" + (s > 0
+                ? ' <span class="eq-arrow">→</span> ' + curA + " ÷ " + curB + ' <span class="same-chip">答えは 3 のまま</span>'
+                : ' <span class="same-chip">答えは 3</span>');
+              if (s >= 1 && !tried) {
+                tried = true;
+                setLessonFeedback("good", "見えた！", "式は 大きく なったのに、答えは 3のまま。何倍かの 関係が 変わらないからだね。×100も 試してみよう。", "correct");
+                lessonNext("つぎへ →", function () { gotoScene(3); });
+              }
+            }
+            $("lesc-x10").addEventListener("click", function () {
+              if (slider.apply("both", 1)) { playSound("click"); refresh(); }
+            });
+            $("lesc-x100").addEventListener("click", function () {
+              if (slider.apply("both", 2)) { playSound("click"); refresh(); }
+            });
+            $("lesc-d10").addEventListener("click", function () {
+              if (slider.apply("both", -1)) { playSound("click"); refresh(); }
+            });
+            refresh();
+          },
+          function () {
+            $("lesson-stage").innerHTML = '<div class="summary-box">3.6 ÷ 1.2 は、両方を <b>10倍</b>しても <b>100倍</b>しても、答えは <b>3</b>。<br>両方を 同じ倍率にすると、何倍かの 関係は 変わらない。</div>';
+            setLessonFeedback("", "", "まとめの あとは、確かめる問いだよ。", "hint");
+            lessonAsk("lessonC-q", function () {
+              lessonNext("つぎへ →", function () { gotoScene(4); });
+            });
+          },
+          function () {
+            lessonFinishScene("3.6 ÷ 1.2 ＝ 3", "小数 ÷ 小数は、<b>両方を 同じ倍率</b>にして、割る数を 整数に 直す。");
+          }
+        ];
+      }
+
+      /* ---------- レッスンD：整数 ÷ 整数（5 ÷ 2） ---------- */
+      function dUnitsHTML(n, cls, label) {
+        var html = "";
+        for (var i = 0; i < n; i++) html += '<div class="d-unit ' + (cls || "") + '">' + (label || "1") + "</div>";
+        return html;
+      }
+      function lessonDScenes() {
+        return [
+          function () {
+            $("lesson-stage").innerHTML = '<div class="big-expr">5 ÷ 2</div>' +
+              '<div class="step-prompt" style="text-align:center;">整数 ÷ 整数でも、わり切れないときは 小数の 答えに なるよ。</div>';
+            setLessonFeedback("", "", "さく だよ。5 ÷ 2 の しくみを つかもう。まずは 見当から。", "hint");
+            lessonEstimate("5", "2", false, function () {
+              lessonNext("つぎへ →", function () { gotoScene(1); });
+            });
+          },
+          function () {
+            $("lesson-stage").innerHTML =
+              '<div class="d-blocks">' +
+              '<div class="d-group"><div class="d-units">' + dUnitsHTML(2) + '</div><div class="d-group-label">1つ分：2</div></div>' +
+              '<div class="d-group"><div class="d-units">' + dUnitsHTML(2) + '</div><div class="d-group-label">1つ分：2</div></div>' +
+              '<div class="d-group"><div class="d-units"><div class="d-unit rem">1</div></div><div class="d-group-label">あまり：1</div></div>' +
+              "</div>" +
+              '<div class="model-note">5を 2つに 分けると、1つ分は 2で、1 あまったね。</div>' +
+              '<div class="model-btn-row"><button type="button" class="sl-btn" id="btn-d-split1">あまり1を 0.1に 分けてみる</button></div>' +
+              '<div id="d-stage2"></div>';
+            setLessonFeedback("", "", "あまりの 1を、そのままにしないで 分けて みよう。", "hint");
+            $("btn-d-split1").addEventListener("click", function () {
+              playSound("decide");
+              $("btn-d-split1").disabled = true;
+              var minis = "";
+              for (var i = 0; i < 10; i++) minis += '<div class="d-unit mini rem">0.1</div>';
+              $("d-stage2").innerHTML =
+                '<div class="model-note">あまり1は、0.1が <b>10個</b>。これを 2つに 分けると…</div>' +
+                '<div class="d-blocks"><div class="d-group"><div class="d-units">' + minis + '</div><div class="d-group-label">0.1が 10個</div></div></div>' +
+                '<div class="model-btn-row"><button type="button" class="sl-btn" id="btn-d-split2">2つに 分ける</button></div>' +
+                '<div id="d-stage3"></div>';
+              $("btn-d-split2").addEventListener("click", function () {
+                playSound("decide");
+                $("btn-d-split2").disabled = true;
+                var five = "";
+                for (var i = 0; i < 5; i++) five += '<div class="d-unit mini">0.1</div>';
+                $("d-stage3").innerHTML =
+                  '<div class="d-blocks">' +
+                  '<div class="d-group"><div class="d-units">' + dUnitsHTML(2) + five + '</div><div class="d-group-label">1つ分：2と 0.5</div></div>' +
+                  '<div class="d-group"><div class="d-units">' + dUnitsHTML(2) + five + '</div><div class="d-group-label">1つ分：2と 0.5</div></div>' +
+                  "</div>" +
+                  '<div class="model-note">1つ分は 2 と 0.5で、<b>2.5</b>。5 ÷ 2 ＝ <b>2.5</b> だね。</div>';
+                setLessonFeedback("good", "見えた！", "あまりを 0.1に 分けて 分け続けると、小数の 答えに なったね。", "correct");
+                lessonNext("つぎへ →", function () { gotoScene(2); });
+              });
+            });
+          },
+          function () {
+            $("lesson-stage").innerHTML = '<div class="summary-box">5 ÷ 2 ＝ 2 あまり 1。あまりの 1を <b>0.1が 10個</b>に 分けて 分けると、<b>0.5</b>。<br>合わせて <b>2.5</b>。</div>';
+            setLessonFeedback("", "", "まとめの あとは、確かめる問いだよ。", "hint");
+            lessonAsk("lessonD-q", function () {
+              lessonNext("つぎへ →", function () { gotoScene(3); });
+            });
+          },
+          function () {
+            lessonFinishScene("5 ÷ 2 ＝ 2.5", "整数 ÷ 整数は、あまりを <b>0.1に 分けて</b> 分け続けると、小数で 答えられる。");
+          }
+        ];
       }
 
       /* ---------- 初期化 ---------- */
@@ -1238,6 +2322,33 @@
         saveSettings();
         renderSoundBtn();
         if (settings.sound) playSound("decide");
+      });
+      $("btn-discover").addEventListener("click", startDiscover);
+      $("btn-discover-back").addEventListener("click", function () { renderTop(); showView("view-top"); });
+      $("btn-lesson-back").addEventListener("click", function () { renderTop(); showView("view-top"); });
+      document.querySelectorAll("#disc-target button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          if (!disc) return;
+          disc.target = b.getAttribute("data-tg");
+          document.querySelectorAll("#disc-target button").forEach(function (x) {
+            x.classList.toggle("on", x === b);
+          });
+          playSound("click");
+        });
+      });
+      $("disc-x10").addEventListener("click", function () { if (disc) discApply(1); });
+      $("disc-x100").addEventListener("click", function () { if (disc) discApply(2); });
+      $("disc-d10").addEventListener("click", function () { if (disc) discApply(-1); });
+      $("disc-reset").addEventListener("click", function () {
+        if (!disc) return;
+        disc.slider.resetShifts();
+        playSound("click");
+        renderDiscEq();
+      });
+      $("nf-a").addEventListener("click", function () { if (!disc) return; disc.sel = "a"; syncDiscover(); });
+      $("nf-b").addEventListener("click", function () { if (!disc) return; disc.sel = "b"; syncDiscover(); });
+      document.querySelectorAll("#disc-keypad button").forEach(function (b) {
+        b.addEventListener("click", function () { if (disc) discKey(b.getAttribute("data-dk")); });
       });
       renderSoundBtn();
       renderTop();
