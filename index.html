@@ -1420,7 +1420,7 @@
         }
         var ready = SKILL_KEYS.every(function (key) {
           var item = profile[key];
-          return item.attempts >= 5 && item.errors / item.attempts <= 0.15;
+          return item.attempts >= 10 && item.errors / item.attempts <= 0.15;
         });
         if (ready) {
           return { kind: "challenge", title: "発展問題に挑戦しよう",
