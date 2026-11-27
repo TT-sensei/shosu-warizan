@@ -535,7 +535,7 @@
         saveJSON(learnerDataKey(LS_SKILL_PROFILE), profile);
       }
 
-      /* ---------- 設定（音の ON/OFF） ---------- */      /* ---------- 設定（音の ON/OFF） ---------- */
+      /* ---------- 設定（音の ON/OFF） ---------- */
       function loadSettings() {
         var s = loadJSON(LS_SETTINGS, null);
         return { sound: !s || s.sound !== false };
