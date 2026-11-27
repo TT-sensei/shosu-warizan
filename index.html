@@ -49,6 +49,10 @@
       .chip-grade { background: var(--primary); color: #fff; border-radius: 999px; padding: 5px 14px; font-size: 14px; font-weight: 700; }
       .sound-toggle { margin-left: auto; border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 16px; font-size: 15px; font-weight: 700; cursor: pointer; color: var(--ink); }
       .sound-toggle:active { transform: scale(.97); }
+      .learner-picker { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: -2px 0 14px; padding: 10px 14px; background: #fff; border: 2px solid var(--line); border-radius: 14px; }
+      .learner-picker label { font-size: 14px; font-weight: 800; color: var(--muted); }
+      .learner-picker select { min-width: 124px; border: 2px solid var(--line); border-radius: 10px; padding: 8px 12px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; font-weight: 700; }
+      .learner-picker small { color: var(--muted); font-size: 12px; }
 
       .home-lead { display: flex; gap: 18px; align-items: center; background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 16px 20px; }
       .home-lead-copy { flex: 1; min-width: 260px; }
@@ -147,6 +151,17 @@
       .p-point { font-size: 40px; font-weight: 900; color: var(--bad); width: 36px; text-align: center; }
       .p-why { background: var(--primary-soft); border-radius: 12px; padding: 8px 16px; font-size: 15px; line-height: 1.9; text-align: center; max-width: 660px; }
       .p-why b { color: var(--primary-dark); }
+      .point-align-wrap { width: 100%; max-width: 660px; overflow-x: auto; padding: 8px 10px 10px; background: #f7fbfe; border: 2px solid var(--line); border-radius: 14px; }
+      .point-align-caption { margin: 0 0 5px; color: var(--muted); font-size: 13px; font-weight: 800; text-align: left; }
+      .quotient-caption { margin-top: 12px; }
+      .point-align-grid { display: grid; justify-content: center; align-items: center; gap: 2px 0; width: max-content; min-width: 100%; }
+      .point-align-digit { width: 50px; height: 56px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--line); border-radius: 9px; background: #fff; color: var(--ink); font-size: 32px; font-weight: 900; font-variant-numeric: tabular-nums; }
+      .point-align-dot { width: 22px; display: flex; align-items: center; justify-content: center; color: var(--bad); font-size: 34px; line-height: 1; font-weight: 900; }
+      .point-align-dot.implicit { color: #9bb4c6; }
+      .point-align-gap { width: 22px; height: 56px; border: 0; border-radius: 8px; background: transparent; cursor: pointer; position: relative; padding: 0; }
+      .point-align-gap::after { content: ""; position: absolute; left: 50%; top: 7px; bottom: 7px; width: 4px; margin-left: -2px; border-radius: 3px; background: var(--primary-soft); }
+      .point-align-gap:hover::after, .point-align-gap:focus-visible::after { background: var(--amber); }
+      .quotient-grid { margin-bottom: 2px; }
 
       .quiz-controls { display: flex; flex-direction: column; gap: 12px; }
       .answer-box { border: 3px dashed var(--line); border-radius: 14px; min-height: 62px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; color: var(--primary-dark); text-align: center; padding: 6px; line-height: 1.35; }
@@ -203,9 +218,18 @@
           <button class="sound-toggle" id="btn-sound" aria-pressed="true">🔊 音 ON</button>
         </header>
 
+        <div class="learner-picker">
+          <label for="learner-select">学習記録を使う人</label>
+          <select id="learner-select" aria-label="学習記録を使う人">
+            <option value="1">1人目</option><option value="2">2人目</option><option value="3">3人目</option>
+            <option value="4">4人目</option><option value="5">5人目</option><option value="6">6人目</option>
+          </select>
+          <small>選んだ人ごとに記録を分けます（本人確認やパスワードはありません）。</small>
+        </div>
+
         <div class="home-lead">
           <div class="home-lead-copy">
-            <p class="lead">まずは 答えが もとの数より 大きくなるか 小さくなるかを 見当して、筆算で わり算を して、さいごに 小数点の 位置を 自分で 確かめよう。1回は 10問です。</p>
+            <p class="lead">小数 ÷ 小数は、答えの大きさを見当してから筆算へ。最後は、わられる数と商の小数点の位置をそろえて確かめよう。1回は10問です。</p>
             <nav class="map-links" aria-label="学びの地図">
               <a href="https://tt-sensei.github.io/jp-learning-taxonomy/site/v2/#topic=jp.elem.math.decimal-multiply-divide" target="_blank" rel="noopener">小数のかけ算・わり算（学びの地図）</a>
             </nav>
@@ -250,7 +274,7 @@
           </button>
         </div>
 
-        <footer class="note">まちがえた 問題と きろくは、この タブレットの 中だけに 保存されます。</footer>
+        <footer class="note">まちがえた 問題と きろくは、この タブレットの 中だけに 保存されます。学習記録を使う人を切り替えると、それぞれの記録を見られます。</footer>
       </section>
 
       <!-- ============ 練習画面 ============ -->
@@ -324,7 +348,7 @@
           <button class="btn ghost" id="btn-records-back">← トップへ もどる</button>
         </div>
         <div class="panel" style="background:transparent;border:none;padding:0;">
-          <h2 style="font-size:24px;margin:4px 0 14px;">れんしゅうの きろく</h2>
+          <h2 style="font-size:24px;margin:4px 0 14px;">れんしゅうの きろく <small id="records-learner" style="font-size:14px;color:var(--muted);font-weight:700;"></small></h2>
           <div class="stat-grid" id="stat-grid"></div>
         </div>
       </section>
@@ -370,6 +394,7 @@
       var LS_MISTAKES = "shosuWarizan.mistakes.v1";
       var LS_STATS = "shosuWarizan.stats.v1";
       var LS_SETTINGS = "shosuWarizan.settings.v1";
+      var LS_ACTIVE_LEARNER = "shosuWarizan.activeLearner.v1";
 
       function loadJSON(key, fallback) {
         try {
@@ -382,12 +407,31 @@
       function saveJSON(key, value) {
         try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
       }
+      function readActiveLearner() {
+        var n = Number(loadJSON(LS_ACTIVE_LEARNER, 1));
+        return Number.isInteger(n) && n >= 1 && n <= 6 ? n : 1;
+      }
+      var activeLearner = readActiveLearner();
+      function learnerDataKey(key) { return key + ".learner-" + activeLearner; }
+      function migrateLegacyRecords() {
+        if (activeLearner !== 1) return;
+        try {
+          [LS_MISTAKES, LS_STATS].forEach(function (key) {
+            var nextKey = key + ".learner-1";
+            var oldValue = localStorage.getItem(key);
+            if (localStorage.getItem(nextKey) === null && oldValue !== null) {
+              localStorage.setItem(nextKey, oldValue);
+            }
+          });
+        } catch (e) { /* 保存できない環境でも学習は続ける */ }
+      }
+      migrateLegacyRecords();
       function loadMistakes() {
-        var m = loadJSON(LS_MISTAKES, []);
+        var m = loadJSON(learnerDataKey(LS_MISTAKES), []);
         return Array.isArray(m) ? m : [];
       }
       function loadStats() {
-        var s = loadJSON(LS_STATS, {});
+        var s = loadJSON(learnerDataKey(LS_STATS), {});
         TYPE_KEYS.forEach(function (k) {
           if (!s[k] || typeof s[k].total !== "number") s[k] = { total: 0, correct: 0 };
         });
@@ -666,8 +710,14 @@
           (session.mode === "tokkun" ? "とっくん： " : "") + typeDef.label);
         $("problem-text").textContent = p.expr + " ＝ ？";
         $("btn-next").classList.add("hidden");
-        renderEstimate();
-        setFeedback("", "", typeDef.hint + "。まずは 答えの 大きさの 見当を つけよう。", "hint");
+        if (p.type === "review") {
+          // 小数÷整数の復習では、わる数が必ず1より大きくなるため、大小の見当問題は省略する。
+          renderHissanPhase();
+          setFeedback("", "", "小数を 整数で わる 筆算を しよう。商の 小数点は、わられる数の 小数点の 真上に 打つよ。", "hint");
+        } else {
+          renderEstimate();
+          setFeedback("", "", typeDef.hint + "。まずは 答えの 大きさの 見当を つけよう。", "hint");
+        }
       }
 
       /* ---------- ステップ1：見当（答えの大きさ） ---------- */
@@ -1006,6 +1056,40 @@
         while (S.length <= p.qp) S = "0" + S;
         return S;
       }
+      // 変換後のわられる数と商の数字を、同じ小数点の位置でそろえて表示する。
+      function pointAlignmentHTML(S, interactive) {
+        var dividend = cur.div.Dstr;
+        var dividendDigits = dividend.replace(".", "");
+        var dividendPoint = dividend.indexOf(".") >= 0 ? dividend.indexOf(".") : dividendDigits.length;
+        var quotientPoint = cur.p.qp > 0 ? cur.correctGap : S.length;
+        var quotientOffset = dividendPoint - quotientPoint;
+        var minPosition = Math.min(0, quotientOffset);
+        var maxPosition = Math.max(dividendDigits.length, quotientOffset + S.length);
+        var digitColumns = maxPosition - minPosition;
+        var gridStyle = "grid-template-columns: repeat(" + digitColumns + ", 50px 22px) 50px;";
+        var html = '<div class="point-align-wrap">';
+        html += '<div class="point-align-caption">ずらした後の わられる数（整数は一の位の右）</div>';
+        html += '<div class="point-align-grid" style="' + gridStyle + '">';
+        for (var i = 0; i < dividendDigits.length; i++) {
+          var dCol = 2 * (i - minPosition) + 1;
+          html += '<span class="point-align-digit" style="grid-column:' + dCol + '">' + dividendDigits[i] + '</span>';
+        }
+        var dividendDotCol = 2 * (dividendPoint - minPosition);
+        html += '<span class="point-align-dot' + (dividend.indexOf(".") < 0 ? " implicit" : "") + '" style="grid-column:' + dividendDotCol + '" aria-label="小数点の位置">.</span>';
+        html += '</div>';
+        html += '<div class="point-align-caption quotient-caption">商の 数字</div>';
+        html += '<div class="point-align-grid quotient-grid" style="' + gridStyle + '">';
+        for (var j = 0; j < S.length; j++) {
+          var qCol = 2 * (quotientOffset + j - minPosition) + 1;
+          html += '<span class="point-align-digit" style="grid-column:' + qCol + '">' + S[j] + '</span>';
+          if (interactive && j > 0) {
+            var gapCol = 2 * (quotientOffset + j - minPosition);
+            html += '<button type="button" class="point-align-gap" data-gap="' + j + '" style="grid-column:' + gapCol + '" aria-label="商の左から' + j + 'けた目の後に小数点を打つ"></button>';
+          }
+        }
+        html += '</div></div>';
+        return html;
+      }
       function renderPoint() {
         cur.phase = "point";
         var p = cur.p;
@@ -1014,25 +1098,19 @@
         cur.correctGap = S.length - p.qp;
         var html = '<span class="step-label">ステップ3：小数点の 位置を 確かめる</span>';
         if (p.qp === 0) {
-          html += '<div class="step-prompt">商の 数字は <b>' + S + '</b>。この答えは 整数に なるから、小数点は いらないね。見当と 合っているか 確かめよう。</div>' +
-            '<div class="point-stage"><div class="point-row">';
-          for (var j = 0; j < S.length; j++) html += '<span class="p-digit">' + S[j] + "</span>";
-          html += '</div><div class="choices"><button type="button" class="choice-btn" id="btn-point-ok">たしかめた</button></div></div>';
+          html += '<div class="step-prompt">商の 数字は <b>' + S + '</b>。この答えは 整数に なるね。上の小数点の位置と、数字の位をそろえて確かめよう。</div>' +
+            '<div class="point-stage">' + pointAlignmentHTML(S, false) +
+            '<div class="choices"><button type="button" class="choice-btn" id="btn-point-ok">小数点は いらない</button></div></div>';
           $("stage-area").innerHTML = html;
-          setAnswerBox("小数点は いらないね", false);
+          setAnswerBox("商は 整数に なるね", false);
           $("btn-point-ok").addEventListener("click", function () {
             playSound("correct");
             finishProblem();
           });
           return;
         }
-        html += '<div class="step-prompt">商の 小数点は、ずらした後の わられる数 <b>' + cur.div.Dstr + '</b> の 小数点の 真上。タップして 打とう。</div>' +
-          '<div class="point-stage"><div class="point-row" id="point-row">';
-        for (var i = 0; i < S.length; i++) {
-          if (i > 0) html += '<button type="button" class="p-gap" data-gap="' + i + '" aria-label="左から' + i + '文字の後"></button>';
-          html += '<span class="p-digit' + (S[i] === "0" && i === 0 ? " zero" : "") + '">' + S[i] + "</span>";
-        }
-        html += "</div></div>";
+        html += '<div class="step-prompt">上の わられる数の 小数点と、同じ位置に 商の 小数点を 打とう。下のマスを タップしてね。</div>' +
+          '<div class="point-stage">' + pointAlignmentHTML(S, true) + '</div>';
         $("stage-area").innerHTML = html;
         setAnswerBox("小数点を 打つ 場所を タップ", false);
         document.querySelectorAll("[data-gap]").forEach(function (b) {
@@ -1056,12 +1134,15 @@
 
       /* 小数点の位置の「わけ」：商の小数点は、ずらした後のわられる数の小数点の真上 */
       function whyHTML(p) {
-        if (p.pb === 0) {
-          return '<div class="p-why">わけ： 小数 ÷ 整数では、商の 小数点は わられる数 <b>' + p.aStr + '</b> の 小数点の <b>真上</b>に 打つよ。</div>';
-        }
         var div = buildDivSteps(p);
+        var pointReference = div.Dstr.indexOf(".") >= 0
+          ? '<b>' + div.Dstr + '</b> の 小数点'
+          : '<b>' + div.Dstr + '</b> の 一の位の右にある小数点';
+        if (p.pb === 0) {
+          return '<div class="p-why">わけ： 小数 ÷ 整数では、商の 小数点は わられる数 ' + pointReference + ' の <b>真上</b>に 打つよ。</div>';
+        }
         return '<div class="p-why">わけ： ' + p.aStr + ' ÷ ' + p.bStr + ' は、両方を <b>' + Math.pow(10, p.pb) + '倍</b>して <b>' +
-          div.Dstr + ' ÷ ' + p.db + '</b> に 直したね。<br>商の 小数点は、' + div.Dstr + ' の 小数点の <b>真上</b>に 打つよ。</div>';
+          div.Dstr + ' ÷ ' + p.db + '</b> に 直したね。<br>商の 小数点は、' + pointReference + ' の <b>真上</b>に 打つよ。</div>';
       }
 
       /* ---------- 問題の完了 ---------- */
@@ -1084,7 +1165,12 @@
         var flawless = !cur.stageFlags.estimate && !cur.stageFlags.hissan && !cur.stageFlags.point;
         var small = divisorVal(p) < 1;
         var body = "答えは " + p.qStr + "。";
-        if (cur.estimateWrong) {
+        if (p.type === "review") {
+          var reviewPointReference = p.aStr.indexOf(".") >= 0
+            ? p.aStr + " の 小数点"
+            : p.aStr + " の 一の位の右にある小数点";
+          body += "商の 小数点は、わられる数 " + reviewPointReference + " の 真上に あるね。";
+        } else if (cur.estimateWrong) {
           body += "見当では、わる数 " + p.bStr + " が 1より " + (small ? "小さい" : "大きい") +
             "から、答えは " + p.aStr + " より " + (small ? "大きく" : "小さく") + " なるはずだったね。次は わる数を 先に 見よう。";
         } else {
@@ -1110,7 +1196,7 @@
           var stats = loadStats();
           stats[p.type].total += 1;
           if (flawless) stats[p.type].correct += 1;
-          saveJSON(LS_STATS, stats);
+          saveJSON(learnerDataKey(LS_STATS), stats);
           if (!flawless) {
             var mistakes = loadMistakes();
             var rec = null;
@@ -1119,7 +1205,7 @@
             }
             if (rec) { rec.stages = stages; }
             else mistakes.push({ type: p.type, da: p.da, pa: p.pa, db: p.db, pb: p.pb, expr: p.expr, stages: stages });
-            saveJSON(LS_MISTAKES, mistakes);
+            saveJSON(learnerDataKey(LS_MISTAKES), mistakes);
           }
         } else { // tokkun
           var ms = loadMistakes();
@@ -1130,7 +1216,7 @@
               if (ms[j].type === p.type && ms[j].expr === p.expr) ms[j].stages = stages;
             }
           }
-          saveJSON(LS_MISTAKES, ms);
+          saveJSON(learnerDataKey(LS_MISTAKES), ms);
         }
       }
       function nextProblem() {
@@ -1186,6 +1272,7 @@
       }
       var STAGE_NAMES = { estimate: "見当", hissan: "筆算", point: "小数点の位置" };
       function renderRecords() {
+        $("records-learner").textContent = "（" + activeLearner + "人目）";
         var stats = loadStats();
         var mistakes = loadMistakes();
         var grid = $("stat-grid");
@@ -1238,6 +1325,14 @@
         saveSettings();
         renderSoundBtn();
         if (settings.sound) playSound("decide");
+      });
+      $("learner-select").value = String(activeLearner);
+      $("learner-select").addEventListener("change", function () {
+        var nextLearner = Number(this.value);
+        if (!Number.isInteger(nextLearner) || nextLearner < 1 || nextLearner > 6) return;
+        activeLearner = nextLearner;
+        saveJSON(LS_ACTIVE_LEARNER, activeLearner);
+        renderTop();
       });
       renderSoundBtn();
       renderTop();
