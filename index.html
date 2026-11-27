@@ -696,6 +696,63 @@
         return problems;
       }
 
+      // 学習状況に合わせて、ねらった力を練習できる10問を組み立てる。
+      function buildRecommendedDeck(recommendation) {
+        if (!recommendation || recommendation.kind === "baseline") return buildDeck("mix");
+        var problems = [], seen = {};
+        function add(kind, wantSmall, accept) {
+          var added = false;
+          for (var attempt = 0; attempt < 1400 && !added; attempt++) {
+            var p = genCandidate(kind, kind, wantSmall);
+            if (!p || seen[p.expr]) continue;
+            if (accept && !accept(p)) continue;
+            seen[p.expr] = true;
+            problems.push(p);
+            added = true;
+          }
+          if (!added && accept) add(kind, wantSmall, null);
+        }
+        var i;
+        if (recommendation.focus === "estimate") {
+          // わる数が1より小さい問題と大きい問題を同数にする。
+          for (i = 0; i < 10; i++) add(i % 2 === 0 ? "basic" : "step2", i < 5);
+        } else if (recommendation.focus === "shift") {
+          // 10倍する型と100倍する型を5問ずつにする。
+          for (i = 0; i < 10; i++) add(i < 5 ? "basic" : "step2", i % 2 === 0);
+        } else if (recommendation.focus === "hissan") {
+          // 商を立てる回数を抑えた問題から、筆算の流れを確かめる。
+          var maxSteps = recommendation.errorRate >= 0.55 ? 2 : 3;
+          for (i = 0; i < 10; i++) {
+            var hKind = i % 4 === 3 ? "step2" : "basic";
+            add(hKind, i % 3 === 0, function (p) {
+              var count = buildDivSteps(p).steps.length;
+              return count >= 2 && count <= maxSteps;
+            });
+          }
+        } else if (recommendation.focus === "point") {
+          // 商が小数になる問題を8問、整数になる問題も2問入れる。
+          for (i = 0; i < 10; i++) {
+            var pKind = i % 2 === 0 ? "basic" : "step2";
+            add(pKind, i % 3 === 0, i < 8 ? function (p) { return p.qp > 0; } : function (p) { return p.qp === 0; });
+          }
+        } else if (recommendation.kind === "challenge") {
+          // 第2位までのわる数を中心に、筆算の段階が少し多い問題に挑戦する。
+          for (i = 0; i < 10; i++) add("step2", i < 5, function (p) { return buildDivSteps(p).steps.length >= 3; });
+        }
+        if (problems.length < 10) {
+          var fallback = buildDeck("mix");
+          fallback.forEach(function (p) {
+            if (problems.length < 10 && !seen[p.expr]) { seen[p.expr] = true; problems.push(p); }
+          });
+        }
+        for (var tries = 0; problems.length < 10 && tries < 5000; tries++) {
+          var extraKind = tries % 2 === 0 ? "basic" : "step2";
+          var extra = genCandidate(extraKind, extraKind, tries % 3 === 0);
+          if (extra && !seen[extra.expr]) { seen[extra.expr] = true; problems.push(extra); }
+        }
+        return shuffle(problems).slice(0, 10);
+      }
+
       /* ================= ナビキャラ ================= */
       var NAVI_WEB = "https://tt-sensei.github.io/navi-character-/assets/web/characters";
       function naviImageHTML(naviId, pose) {
