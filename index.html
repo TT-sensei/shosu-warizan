@@ -348,7 +348,7 @@
           <button class="btn ghost" id="btn-records-back">← トップへ もどる</button>
         </div>
         <div class="panel" style="background:transparent;border:none;padding:0;">
-          <h2 style="font-size:24px;margin:4px 0 14px;">れんしゅうの きろく</h2>
+          <h2 style="font-size:24px;margin:4px 0 14px;">れんしゅうの きろく <small id="records-learner" style="font-size:14px;color:var(--muted);font-weight:700;"></small></h2>
           <div class="stat-grid" id="stat-grid"></div>
         </div>
       </section>
@@ -1272,6 +1272,7 @@
       }
       var STAGE_NAMES = { estimate: "見当", hissan: "筆算", point: "小数点の位置" };
       function renderRecords() {
+        $("records-learner").textContent = "（" + activeLearner + "人目）";
         var stats = loadStats();
         var mistakes = loadMistakes();
         var grid = $("stat-grid");
