@@ -90,7 +90,12 @@
       .skill-card p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
       .skill-meter { height: 8px; margin-top: 8px; overflow: hidden; background: var(--primary-soft); border-radius: 999px; }
       .skill-meter-fill { height: 100%; background: var(--primary); border-radius: 999px; }
-      @media (max-width: 650px) { .recommendation-panel { align-items: stretch; flex-direction: column; } .recommendation-action { justify-content: space-between; } }
+      .backup-section { margin: 0 0 16px; padding: 14px 16px; background: #fff; border: 2px solid var(--line); border-radius: var(--radius); }
+      .backup-section h3 { margin: 0 0 5px; font-size: 18px; }
+      .backup-section p { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+      .backup-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+      .backup-status { min-height: 1.4em; margin: 8px 0 0 !important; color: var(--primary-dark) !important; font-weight: 700; }
+      @media (max-width: 650px) { .recommendation-panel { align-items: stretch; flex-direction: column; } .recommendation-action { justify-content: space-between; } .backup-actions .btn { flex: 1 1 100%; } }
 
       .learning-note { margin-top: 20px; background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 16px 20px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
       .learning-note h2 { margin: 2px 0 6px; font-size: 20px; }
@@ -388,6 +393,16 @@
             <p class="skill-profile-intro">それぞれの段階で、ヒントを使う前に自分で進められたかを記録しています。回数が少ないうちは、得意・苦手を決めつけません。</p>
             <div class="skill-profile-grid" id="skill-profile-grid"></div>
           </section>
+          <section class="backup-section" aria-labelledby="backup-title">
+            <h3 id="backup-title">学習記録のバックアップ</h3>
+            <p>この人の記録をファイルに保存できます。別の端末では、記録を入れたい人を選んでから読み込んでください。読み込むと、選択中の人の記録に置き換わります。</p>
+            <div class="backup-actions">
+              <button class="btn" id="btn-export-records" type="button">この人の記録を保存</button>
+              <button class="btn" id="btn-import-records" type="button">記録を読み込む</button>
+              <input id="input-import-records" type="file" accept=".json,application/json" hidden />
+            </div>
+            <p class="backup-status" id="backup-status" role="status" aria-live="polite"></p>
+          </section>
           <div class="stat-grid" id="stat-grid"></div>
         </div>
       </section>
@@ -483,29 +498,44 @@
         var profile = loadJSON(learnerDataKey(LS_SKILL_PROFILE), {});
         SKILL_KEYS.forEach(function (key) {
           var item = profile[key];
-          if (!item || typeof item.attempts !== "number") profile[key] = { attempts: 0, clean: 0, errors: 0 };
-          else {
+          if (!item || typeof item.attempts !== "number") {
+            profile[key] = { attempts: 0, clean: 0, errors: 0, recent: [] };
+          } else {
             if (typeof item.clean !== "number") item.clean = 0;
             if (typeof item.errors !== "number") item.errors = 0;
+            if (!Array.isArray(item.recent)) item.recent = [];
+            item.recent = item.recent.filter(function (v) { return typeof v === "boolean"; }).slice(-10);
           }
         });
         return profile;
+      }
+      // true は「その段階でつまずいた」、false は「最初からできた」。
+      // 推薦は通算値ではなく、直近最大10回の様子をもとに判断する。
+      function getSkillEvidence(item) {
+        var recent = Array.isArray(item.recent) ? item.recent.slice(-10) : [];
+        var errors = recent.filter(function (v) { return v === true; }).length;
+        return { attempts: recent.length, errors: errors, clean: recent.length - errors };
       }
       function recordSkillProfile(problem, flags) {
         var profile = loadSkillProfile();
         var applicable = [];
         if (problem.type !== "review") applicable.push("estimate");
         if (problem.pb > 0) applicable.push("shift");
-        applicable.push("hissan", "point");
+        applicable.push("hissan");
+        // 整数の商では小数点の位置を選ばないため、技能評価の対象にしない。
+        if (problem.qp > 0) applicable.push("point");
         applicable.forEach(function (key) {
-          profile[key].attempts += 1;
-          if (flags[key]) profile[key].errors += 1;
-          else profile[key].clean += 1;
+          var item = profile[key];
+          item.attempts += 1;
+          if (flags[key]) item.errors += 1;
+          else item.clean += 1;
+          item.recent.push(!!flags[key]);
+          if (item.recent.length > 10) item.recent.shift();
         });
         saveJSON(learnerDataKey(LS_SKILL_PROFILE), profile);
       }
 
-      /* ---------- 設定（音の ON/OFF） ---------- */
+      /* ---------- 設定（音の ON/OFF） ---------- */      /* ---------- 設定（音の ON/OFF） ---------- */
       function loadSettings() {
         var s = loadJSON(LS_SETTINGS, null);
         return { sound: !s || s.sound !== false };
@@ -1401,11 +1431,13 @@
         var profile = loadSkillProfile();
         var weakest = null;
         SKILL_KEYS.forEach(function (key) {
-          var item = profile[key];
-          var rate = item.attempts ? item.errors / item.attempts : 0;
-          // 3回以上の機会があり、2回以上つまずいた段階だけを重点候補にする。
-          if (item.attempts >= 3 && item.errors >= 2 && rate >= 0.4) {
-            if (!weakest || rate > weakest.errorRate) weakest = { focus: key, attempts: item.attempts, errorRate: rate };
+          var evidence = getSkillEvidence(profile[key]);
+          var rate = evidence.attempts ? evidence.errors / evidence.attempts : 0;
+          // 直近5回以上を確認し、2回以上・40%以上つまずいた段階を重点候補にする。
+          if (evidence.attempts >= 5 && evidence.errors >= 2 && rate >= 0.4) {
+            if (!weakest || rate > weakest.errorRate) {
+              weakest = { focus: key, attempts: evidence.attempts, errorRate: rate };
+            }
           }
         });
         if (weakest) {
@@ -1419,18 +1451,20 @@
             title: SKILL_LABELS[weakest.focus] + "練習しよう", description: descriptions[weakest.focus] };
         }
         var ready = SKILL_KEYS.every(function (key) {
-          var item = profile[key];
-          return item.attempts >= 10 && item.errors / item.attempts <= 0.15;
+          var evidence = getSkillEvidence(profile[key]);
+          return evidence.attempts >= 10 && evidence.errors / evidence.attempts <= 0.15;
         });
         if (ready) {
           return { kind: "challenge", title: "発展問題に挑戦しよう",
             description: "4つの段階で安定して進められているね。小数第2位を含む、少し手ごたえのある問題に挑戦しよう。" };
         }
-        var total = SKILL_KEYS.reduce(function (sum, key) { return sum + profile[key].attempts; }, 0);
-        return { kind: "baseline", title: total === 0 ? "まずは ミックスで 力をチェック" : "ミックスで 練習を続けよう",
-          description: total === 0
+        var totalRecent = SKILL_KEYS.reduce(function (sum, key) {
+          return sum + getSkillEvidence(profile[key]).attempts;
+        }, 0);
+        return { kind: "baseline", title: totalRecent === 0 ? "まずは ミックスで 力をチェック" : "ミックスで 練習を続けよう",
+          description: totalRecent === 0
             ? "まずはミックス問題に挑戦。取り組みの様子を見ながら、次のおすすめを考えるよ。"
-            : "今までの練習の記録を集めているよ。いろいろな問題に取り組んで、自分の力を確かめよう。" };
+            : "最近の取り組みを集めているよ。いろいろな問題に取り組んで、自分の力を確かめよう。" };
       }
       function renderRecommendation() {
         var recommendation = getLearningRecommendation();
@@ -1452,21 +1486,154 @@
         var grid = $("skill-profile-grid");
         grid.innerHTML = "";
         SKILL_KEYS.forEach(function (key) {
-          var item = profile[key];
-          var rate = item.attempts ? Math.round(item.clean / item.attempts * 100) : 0;
-          var status = item.attempts < 3 ? "記録を集めています" : item.errors / item.attempts >= 0.4 ? "ここを中心に練習中" : rate >= 85 ? "安定してきたね" : "練習を続けよう";
-          var detail = item.attempts < 3
-            ? (item.attempts === 0 ? "これから練習の記録を集めるよ。" : "もう少し取り組んで、様子を見よう。")
-            : "1回目でできた：" + item.clean + " / " + item.attempts + "回";
+          var evidence = getSkillEvidence(profile[key]);
+          var rate = evidence.attempts ? Math.round(evidence.clean / evidence.attempts * 100) : 0;
+          var enough = evidence.attempts >= 5;
+          var status = !enough ? "記録を集めています" : evidence.errors / evidence.attempts >= 0.4 ? "ここを中心に練習中" : rate >= 85 ? "安定してきたね" : "練習を続けよう";
+          var detail = evidence.attempts === 0
+            ? "この更新後の取り組みから記録を集めるよ。"
+            : evidence.attempts < 5
+              ? "直近" + evidence.attempts + "回を記録中。もう少し様子を見よう。"
+              : "直近" + evidence.attempts + "回でできた：" + evidence.clean + " / " + evidence.attempts + "回";
           var card = document.createElement("div");
           card.className = "skill-card";
           card.innerHTML = "<h4>" + SKILL_LABELS[key] + "</h4>" +
             "<div class=\"skill-status\">" + status + "</div>" +
-            "<div class=\"skill-meter\"><div class=\"skill-meter-fill\" style=\"width:" + (item.attempts < 3 ? 0 : rate) + "%\"></div></div>" +
+            "<div class=\"skill-meter\"><div class=\"skill-meter-fill\" style=\"width:" + (enough ? rate : 0) + "%\"></div></div>" +
             "<p>" + detail + "</p>";
           grid.appendChild(card);
         });
       }
+      /* ---------- 学習記録のバックアップ ---------- */
+      function exportLearnerRecords() {
+        try {
+          var payload = {
+            app: "tt-sensei-shosu-warizan",
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            learner: activeLearner,
+            data: {
+              mistakes: loadMistakes(),
+              stats: loadStats(),
+              skillProfile: loadSkillProfile()
+            }
+          };
+          var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+          var url = URL.createObjectURL(blob);
+          var link = document.createElement("a");
+          var stamp = new Date();
+          var ymd = stamp.getFullYear() + String(stamp.getMonth() + 1).padStart(2, "0") + String(stamp.getDate()).padStart(2, "0");
+          link.href = url;
+          link.download = "shosu-warizan-learner-" + activeLearner + "-" + ymd + ".json";
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+          $("backup-status").textContent = activeLearner + "人目の記録を保存するファイルを作成したよ。";
+        } catch (e) {
+          $("backup-status").textContent = "ファイルを作成できませんでした。このブラウザーの設定を確認してね。";
+        }
+      }
+      function validateBackupPayload(payload) {
+        if (!payload || payload.app !== "tt-sensei-shosu-warizan" || payload.version !== 1) {
+          throw new Error("この教材のバックアップファイルではありません。");
+        }
+        var data = payload.data;
+        if (!data || !Array.isArray(data.mistakes) || !data.stats || !data.skillProfile) {
+          throw new Error("ファイルの中に学習記録が見つかりません。");
+        }
+        var allowedStages = SKILL_KEYS;
+        var mistakes = data.mistakes.map(function (m) {
+          if (!m || TYPE_KEYS.indexOf(m.type) < 0 ||
+              !Number.isInteger(m.da) || m.da < 1 || m.da > 99999 ||
+              !Number.isInteger(m.pa) || m.pa < 0 || m.pa > 2 ||
+              !Number.isInteger(m.db) || m.db < 1 || m.db > 9999 ||
+              !Number.isInteger(m.pb) || m.pb < 0 || m.pb > 2 ||
+              !computeQ(m.da, m.pa, m.db, m.pb)) {
+            throw new Error("間違い直しの記録に読み込めないデータがあります。");
+          }
+          return {
+            type: m.type, da: m.da, pa: m.pa, db: m.db, pb: m.pb,
+            expr: fmtDec(m.da, m.pa) + " ÷ " + fmtDec(m.db, m.pb),
+            stages: Array.isArray(m.stages) ? m.stages.filter(function (stage) {
+              return allowedStages.indexOf(stage) >= 0;
+            }) : []
+          };
+        });
+        var stats = {};
+        TYPE_KEYS.forEach(function (key) {
+          var item = data.stats[key] || { total: 0, correct: 0 };
+          if (!Number.isInteger(item.total) || item.total < 0 ||
+              !Number.isInteger(item.correct) || item.correct < 0 || item.correct > item.total) {
+            throw new Error("練習回数の記録に読み込めないデータがあります。");
+          }
+          stats[key] = { total: item.total, correct: item.correct };
+        });
+        var skillProfile = {};
+        SKILL_KEYS.forEach(function (key) {
+          var item = data.skillProfile[key] || { attempts: 0, clean: 0, errors: 0, recent: [] };
+          var recent = item.recent == null ? [] : item.recent;
+          if (!Number.isInteger(item.attempts) || item.attempts < 0 ||
+              !Number.isInteger(item.clean) || item.clean < 0 ||
+              !Number.isInteger(item.errors) || item.errors < 0 ||
+              item.clean + item.errors !== item.attempts ||
+              !Array.isArray(recent) || recent.length > 10 ||
+              recent.some(function (v) { return typeof v !== "boolean"; })) {
+            throw new Error("技能記録に読み込めないデータがあります。");
+          }
+          skillProfile[key] = {
+            attempts: item.attempts, clean: item.clean, errors: item.errors, recent: recent.slice()
+          };
+        });
+        return { mistakes: mistakes, stats: stats, skillProfile: skillProfile };
+      }
+      function importLearnerRecords(file) {
+        if (!file) return;
+        if (file.size > 500000) {
+          $("backup-status").textContent = "ファイルのサイズが大きすぎます。正しいバックアップファイルを選んでね。";
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function () {
+          try {
+            var payload = JSON.parse(String(reader.result || ""));
+            var records = validateBackupPayload(payload);
+            var source = Number.isInteger(payload.learner) && payload.learner >= 1 && payload.learner <= 6
+              ? payload.learner + "人目" : "保存ファイル";
+            if (!window.confirm(source + "の記録を、現在選んでいる" + activeLearner +
+                "人目の記録に読み込みます。今ある記録は置き換わります。よろしいですか？")) {
+              $("backup-status").textContent = "読み込みをキャンセルしたよ。";
+              return;
+            }
+            var entries = [
+              [learnerDataKey(LS_MISTAKES), records.mistakes],
+              [learnerDataKey(LS_STATS), records.stats],
+              [learnerDataKey(LS_SKILL_PROFILE), records.skillProfile]
+            ];
+            var previous = entries.map(function (entry) { return localStorage.getItem(entry[0]); });
+            try {
+              entries.forEach(function (entry) { localStorage.setItem(entry[0], JSON.stringify(entry[1])); });
+            } catch (writeError) {
+              entries.forEach(function (entry, index) {
+                try {
+                  if (previous[index] === null) localStorage.removeItem(entry[0]);
+                  else localStorage.setItem(entry[0], previous[index]);
+                } catch (restoreError) {}
+              });
+              throw new Error("この端末に保存できませんでした。空き容量やブラウザーの設定を確認してね。");
+            }
+            $("backup-status").textContent = activeLearner + "人目の記録を読み込んだよ。";
+            renderRecords();
+          } catch (e) {
+            $("backup-status").textContent = e && e.message ? e.message : "ファイルを読み込めませんでした。";
+          }
+        };
+        reader.onerror = function () {
+          $("backup-status").textContent = "ファイルを読み込めませんでした。もう一度試してね。";
+        };
+        reader.readAsText(file, "UTF-8");
+      }
+
       function renderRecords() {
         $("records-learner").textContent = "（" + activeLearner + "人目）";
         var stats = loadStats();
@@ -1511,6 +1678,13 @@
       $("btn-quit").addEventListener("click", function () { renderTop(); showView("view-top"); });
       $("btn-tokkun").addEventListener("click", function () { if (loadMistakes().length) startTokkun(); });
       $("btn-records").addEventListener("click", renderRecords);
+      $("btn-export-records").addEventListener("click", exportLearnerRecords);
+      $("btn-import-records").addEventListener("click", function () { $("input-import-records").click(); });
+      $("input-import-records").addEventListener("change", function () {
+        var file = this.files && this.files[0];
+        this.value = "";
+        importLearnerRecords(file);
+      });
       $("btn-records-back").addEventListener("click", function () { renderTop(); showView("view-top"); });
       $("btn-again").addEventListener("click", function () {
         if (session && session.mode === "tokkun") startTokkun();
