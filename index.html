@@ -70,6 +70,28 @@
       .type-card .tc-navi { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--tc, var(--primary)); }
       .type-card .tc-navi img { width: 34px; height: 44px; object-fit: contain; }
 
+      .recommendation-panel { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 18px 0 8px; padding: 16px 20px; background: #fff; border: 2px solid var(--line); border-left: 7px solid var(--primary); border-radius: var(--radius); }
+      .recommendation-copy { flex: 1; min-width: 220px; }
+      .recommendation-eyebrow { margin: 0 0 4px; color: var(--primary); font-size: 12px; font-weight: 900; letter-spacing: .12em; }
+      .recommendation-panel h2 { margin: 0 0 5px; font-size: 21px; }
+      .recommendation-panel p { margin: 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
+      .recommendation-action { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .recommendation-meta { color: var(--muted); font-size: 12px; white-space: nowrap; }
+      .recommendation-btn { border: 0; border-radius: 12px; background: var(--primary); color: #fff; padding: 13px 20px; font: inherit; font-weight: 800; font-size: 17px; cursor: pointer; white-space: nowrap; }
+      .recommendation-btn:active { transform: scale(.97); }
+
+      .skill-profile-section { margin: 0 0 20px; padding: 16px; background: #fff; border: 2px solid var(--line); border-radius: var(--radius); }
+      .skill-profile-section h3 { margin: 0 0 4px; font-size: 19px; }
+      .skill-profile-intro { margin: 0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+      .skill-profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(205px, 1fr)); gap: 10px; }
+      .skill-card { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fbfdff; }
+      .skill-card h4 { margin: 0 0 5px; font-size: 16px; }
+      .skill-card .skill-status { color: var(--primary-dark); font-size: 12px; font-weight: 800; }
+      .skill-card p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+      .skill-meter { height: 8px; margin-top: 8px; overflow: hidden; background: var(--primary-soft); border-radius: 999px; }
+      .skill-meter-fill { height: 100%; background: var(--primary); border-radius: 999px; }
+      @media (max-width: 650px) { .recommendation-panel { align-items: stretch; flex-direction: column; } .recommendation-action { justify-content: space-between; } }
+
       .learning-note { margin-top: 20px; background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 16px 20px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
       .learning-note h2 { margin: 2px 0 6px; font-size: 20px; }
       .learning-note p { margin: 0 0 6px; line-height: 1.65; }
@@ -246,6 +268,18 @@
           </script>
         </div>
 
+        <section class="recommendation-panel" aria-live="polite" aria-labelledby="recommendation-title">
+          <div class="recommendation-copy">
+            <p class="recommendation-eyebrow">TODAY'S RECOMMENDATION</p>
+            <h2 id="recommendation-title">まずは ミックスで 力をチェック</h2>
+            <p id="recommendation-description">今までの練習をもとに、おすすめの10問を用意するよ。</p>
+          </div>
+          <div class="recommendation-action">
+            <span class="recommendation-meta" id="recommendation-meta">おすすめ 10問</span>
+            <button class="recommendation-btn" id="btn-recommended">おすすめに挑戦！</button>
+          </div>
+        </section>
+
         <h2 class="section-label">れんしゅうを えらぼう</h2>
         <div class="grid" id="type-grid"></div>
 
@@ -349,6 +383,11 @@
         </div>
         <div class="panel" style="background:transparent;border:none;padding:0;">
           <h2 style="font-size:24px;margin:4px 0 14px;">れんしゅうの きろく <small id="records-learner" style="font-size:14px;color:var(--muted);font-weight:700;"></small></h2>
+          <section class="skill-profile-section" aria-labelledby="skill-profile-title">
+            <h3 id="skill-profile-title">計算の力のようす</h3>
+            <p class="skill-profile-intro">それぞれの段階で、ヒントを使う前に自分で進められたかを記録しています。回数が少ないうちは、得意・苦手を決めつけません。</p>
+            <div class="skill-profile-grid" id="skill-profile-grid"></div>
+          </section>
           <div class="stat-grid" id="stat-grid"></div>
         </div>
       </section>
@@ -395,6 +434,7 @@
       var LS_STATS = "shosuWarizan.stats.v1";
       var LS_SETTINGS = "shosuWarizan.settings.v1";
       var LS_ACTIVE_LEARNER = "shosuWarizan.activeLearner.v1";
+      var LS_SKILL_PROFILE = "shosuWarizan.skillProfile.v1";
 
       function loadJSON(key, fallback) {
         try {
@@ -436,6 +476,33 @@
           if (!s[k] || typeof s[k].total !== "number") s[k] = { total: 0, correct: 0 };
         });
         return s;
+      }
+      var SKILL_KEYS = ["estimate", "shift", "hissan", "point"];
+      var SKILL_LABELS = { estimate: "見当をつける", shift: "整数に直す", hissan: "筆算する", point: "小数点を判断する" };
+      function loadSkillProfile() {
+        var profile = loadJSON(learnerDataKey(LS_SKILL_PROFILE), {});
+        SKILL_KEYS.forEach(function (key) {
+          var item = profile[key];
+          if (!item || typeof item.attempts !== "number") profile[key] = { attempts: 0, clean: 0, errors: 0 };
+          else {
+            if (typeof item.clean !== "number") item.clean = 0;
+            if (typeof item.errors !== "number") item.errors = 0;
+          }
+        });
+        return profile;
+      }
+      function recordSkillProfile(problem, flags) {
+        var profile = loadSkillProfile();
+        var applicable = [];
+        if (problem.type !== "review") applicable.push("estimate");
+        if (problem.pb > 0) applicable.push("shift");
+        applicable.push("hissan", "point");
+        applicable.forEach(function (key) {
+          profile[key].attempts += 1;
+          if (flags[key]) profile[key].errors += 1;
+          else profile[key].clean += 1;
+        });
+        saveJSON(learnerDataKey(LS_SKILL_PROFILE), profile);
       }
 
       /* ---------- 設定（音の ON/OFF） ---------- */
