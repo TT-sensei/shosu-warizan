@@ -70,6 +70,28 @@
       .type-card .tc-navi { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--tc, var(--primary)); }
       .type-card .tc-navi img { width: 34px; height: 44px; object-fit: contain; }
 
+      .recommendation-panel { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 18px 0 8px; padding: 16px 20px; background: #fff; border: 2px solid var(--line); border-left: 7px solid var(--primary); border-radius: var(--radius); }
+      .recommendation-copy { flex: 1; min-width: 220px; }
+      .recommendation-eyebrow { margin: 0 0 4px; color: var(--primary); font-size: 12px; font-weight: 900; letter-spacing: .12em; }
+      .recommendation-panel h2 { margin: 0 0 5px; font-size: 21px; }
+      .recommendation-panel p { margin: 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
+      .recommendation-action { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .recommendation-meta { color: var(--muted); font-size: 12px; white-space: nowrap; }
+      .recommendation-btn { border: 0; border-radius: 12px; background: var(--primary); color: #fff; padding: 13px 20px; font: inherit; font-weight: 800; font-size: 17px; cursor: pointer; white-space: nowrap; }
+      .recommendation-btn:active { transform: scale(.97); }
+
+      .skill-profile-section { margin: 0 0 20px; padding: 16px; background: #fff; border: 2px solid var(--line); border-radius: var(--radius); }
+      .skill-profile-section h3 { margin: 0 0 4px; font-size: 19px; }
+      .skill-profile-intro { margin: 0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+      .skill-profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(205px, 1fr)); gap: 10px; }
+      .skill-card { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fbfdff; }
+      .skill-card h4 { margin: 0 0 5px; font-size: 16px; }
+      .skill-card .skill-status { color: var(--primary-dark); font-size: 12px; font-weight: 800; }
+      .skill-card p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+      .skill-meter { height: 8px; margin-top: 8px; overflow: hidden; background: var(--primary-soft); border-radius: 999px; }
+      .skill-meter-fill { height: 100%; background: var(--primary); border-radius: 999px; }
+      @media (max-width: 650px) { .recommendation-panel { align-items: stretch; flex-direction: column; } .recommendation-action { justify-content: space-between; } }
+
       .learning-note { margin-top: 20px; background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 16px 20px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
       .learning-note h2 { margin: 2px 0 6px; font-size: 20px; }
       .learning-note p { margin: 0 0 6px; line-height: 1.65; }
@@ -246,6 +268,18 @@
           </script>
         </div>
 
+        <section class="recommendation-panel" aria-live="polite" aria-labelledby="recommendation-title">
+          <div class="recommendation-copy">
+            <p class="recommendation-eyebrow">TODAY'S RECOMMENDATION</p>
+            <h2 id="recommendation-title">まずは ミックスで 力をチェック</h2>
+            <p id="recommendation-description">今までの練習をもとに、おすすめの10問を用意するよ。</p>
+          </div>
+          <div class="recommendation-action">
+            <span class="recommendation-meta" id="recommendation-meta">おすすめ 10問</span>
+            <button class="recommendation-btn" id="btn-recommended">おすすめに挑戦！</button>
+          </div>
+        </section>
+
         <h2 class="section-label">れんしゅうを えらぼう</h2>
         <div class="grid" id="type-grid"></div>
 
@@ -349,6 +383,11 @@
         </div>
         <div class="panel" style="background:transparent;border:none;padding:0;">
           <h2 style="font-size:24px;margin:4px 0 14px;">れんしゅうの きろく <small id="records-learner" style="font-size:14px;color:var(--muted);font-weight:700;"></small></h2>
+          <section class="skill-profile-section" aria-labelledby="skill-profile-title">
+            <h3 id="skill-profile-title">計算の力のようす</h3>
+            <p class="skill-profile-intro">それぞれの段階で、ヒントを使う前に自分で進められたかを記録しています。回数が少ないうちは、得意・苦手を決めつけません。</p>
+            <div class="skill-profile-grid" id="skill-profile-grid"></div>
+          </section>
           <div class="stat-grid" id="stat-grid"></div>
         </div>
       </section>
@@ -395,6 +434,7 @@
       var LS_STATS = "shosuWarizan.stats.v1";
       var LS_SETTINGS = "shosuWarizan.settings.v1";
       var LS_ACTIVE_LEARNER = "shosuWarizan.activeLearner.v1";
+      var LS_SKILL_PROFILE = "shosuWarizan.skillProfile.v1";
 
       function loadJSON(key, fallback) {
         try {
@@ -436,6 +476,33 @@
           if (!s[k] || typeof s[k].total !== "number") s[k] = { total: 0, correct: 0 };
         });
         return s;
+      }
+      var SKILL_KEYS = ["estimate", "shift", "hissan", "point"];
+      var SKILL_LABELS = { estimate: "見当をつける", shift: "整数に直す", hissan: "筆算する", point: "小数点を判断する" };
+      function loadSkillProfile() {
+        var profile = loadJSON(learnerDataKey(LS_SKILL_PROFILE), {});
+        SKILL_KEYS.forEach(function (key) {
+          var item = profile[key];
+          if (!item || typeof item.attempts !== "number") profile[key] = { attempts: 0, clean: 0, errors: 0 };
+          else {
+            if (typeof item.clean !== "number") item.clean = 0;
+            if (typeof item.errors !== "number") item.errors = 0;
+          }
+        });
+        return profile;
+      }
+      function recordSkillProfile(problem, flags) {
+        var profile = loadSkillProfile();
+        var applicable = [];
+        if (problem.type !== "review") applicable.push("estimate");
+        if (problem.pb > 0) applicable.push("shift");
+        applicable.push("hissan", "point");
+        applicable.forEach(function (key) {
+          profile[key].attempts += 1;
+          if (flags[key]) profile[key].errors += 1;
+          else profile[key].clean += 1;
+        });
+        saveJSON(learnerDataKey(LS_SKILL_PROFILE), profile);
       }
 
       /* ---------- 設定（音の ON/OFF） ---------- */
@@ -629,6 +696,63 @@
         return problems;
       }
 
+      // 学習状況に合わせて、ねらった力を練習できる10問を組み立てる。
+      function buildRecommendedDeck(recommendation) {
+        if (!recommendation || recommendation.kind === "baseline") return buildDeck("mix");
+        var problems = [], seen = {};
+        function add(kind, wantSmall, accept) {
+          var added = false;
+          for (var attempt = 0; attempt < 1400 && !added; attempt++) {
+            var p = genCandidate(kind, kind, wantSmall);
+            if (!p || seen[p.expr]) continue;
+            if (accept && !accept(p)) continue;
+            seen[p.expr] = true;
+            problems.push(p);
+            added = true;
+          }
+          if (!added && accept) add(kind, wantSmall, null);
+        }
+        var i;
+        if (recommendation.focus === "estimate") {
+          // わる数が1より小さい問題と大きい問題を同数にする。
+          for (i = 0; i < 10; i++) add(i % 2 === 0 ? "basic" : "step2", i < 5);
+        } else if (recommendation.focus === "shift") {
+          // 10倍する型と100倍する型を5問ずつにする。
+          for (i = 0; i < 10; i++) add(i < 5 ? "basic" : "step2", i % 2 === 0);
+        } else if (recommendation.focus === "hissan") {
+          // 商を立てる回数を抑えた問題から、筆算の流れを確かめる。
+          var maxSteps = recommendation.errorRate >= 0.55 ? 2 : 3;
+          for (i = 0; i < 10; i++) {
+            var hKind = i % 4 === 3 ? "step2" : "basic";
+            add(hKind, i % 3 === 0, function (p) {
+              var count = buildDivSteps(p).steps.length;
+              return count >= 2 && count <= maxSteps;
+            });
+          }
+        } else if (recommendation.focus === "point") {
+          // 商が小数になる問題を8問、整数になる問題も2問入れる。
+          for (i = 0; i < 10; i++) {
+            var pKind = i % 2 === 0 ? "basic" : "step2";
+            add(pKind, i % 3 === 0, i < 8 ? function (p) { return p.qp > 0; } : function (p) { return p.qp === 0; });
+          }
+        } else if (recommendation.kind === "challenge") {
+          // 第2位までのわる数を中心に、筆算の段階が少し多い問題に挑戦する。
+          for (i = 0; i < 10; i++) add("step2", i < 5, function (p) { return buildDivSteps(p).steps.length >= 3; });
+        }
+        if (problems.length < 10) {
+          var fallback = buildDeck("mix");
+          fallback.forEach(function (p) {
+            if (problems.length < 10 && !seen[p.expr]) { seen[p.expr] = true; problems.push(p); }
+          });
+        }
+        for (var tries = 0; problems.length < 10 && tries < 5000; tries++) {
+          var extraKind = tries % 2 === 0 ? "basic" : "step2";
+          var extra = genCandidate(extraKind, extraKind, tries % 3 === 0);
+          if (extra && !seen[extra.expr]) { seen[extra.expr] = true; problems.push(extra); }
+        }
+        return shuffle(problems).slice(0, 10);
+      }
+
       /* ================= ナビキャラ ================= */
       var NAVI_WEB = "https://tt-sensei.github.io/navi-character-/assets/web/characters";
       function naviImageHTML(naviId, pose) {
@@ -678,6 +802,14 @@
         startProblem();
         playSound("start");
       }
+      function startRecommendedPractice() {
+        var recommendation = getLearningRecommendation();
+        session = { mode: "recommended", type: null, recommendation: recommendation,
+          problems: buildRecommendedDeck(recommendation), idx: 0, flawless: 0, cleared: 0 };
+        showView("view-quiz");
+        startProblem();
+        playSound("start");
+      }
       function startTokkun() {
         var mistakes = loadMistakes();
         if (!mistakes.length) return;
@@ -701,13 +833,13 @@
         var typeDef = TYPES[p.type];
         cur = {
           p: p, naviId: typeDef.naviId, naviName: typeDef.navi,
-          phase: "estimate", stageFlags: {}, estimateWrong: false,
+          phase: "estimate", stageFlags: { estimate: false, shift: false, hissan: false, point: false }, estimateWrong: false,
           div: null, stepIdx: 0, filledQ: {}, consecErr: 0, shiftDone: false
         };
         $("progress-label").textContent = (session.idx + 1) + " / " + session.problems.length + " もん";
         $("progress-fill").style.width = (session.idx / session.problems.length * 100) + "%";
         $("quiz-navi").innerHTML = naviHTML(cur.naviId, "waving",
-          (session.mode === "tokkun" ? "とっくん： " : "") + typeDef.label);
+          (session.mode === "tokkun" ? "とっくん： " : session.mode === "recommended" ? "おすすめ： " : "") + typeDef.label);
         $("problem-text").textContent = p.expr + " ＝ ？";
         $("btn-next").classList.add("hidden");
         if (p.type === "review") {
@@ -792,7 +924,7 @@
                   " に なるね（答えは 同じ）。小数点が " + p.pb + "けた ずれたことも 見ておこう。" };
               beginDiv();
             } else {
-              cur.stageFlags.hissan = true;
+              cur.stageFlags.shift = true;
               playSound("wrong");
               setFeedback("bad", "おしい！",
                 p.bStr + " の 小数点の 右は " + p.pb + " けた。" + p.pb + "けた ずらして 整数に するには、何倍かな？", "retry");
@@ -1162,7 +1294,7 @@
         $("stage-area").innerHTML = html;
         setAnswerBox(p.expr + " ＝ " + p.qStr, true);
 
-        var flawless = !cur.stageFlags.estimate && !cur.stageFlags.hissan && !cur.stageFlags.point;
+        var flawless = !cur.stageFlags.estimate && !cur.stageFlags.shift && !cur.stageFlags.hissan && !cur.stageFlags.point;
         var small = divisorVal(p) < 1;
         var body = "答えは " + p.qStr + "。";
         if (p.type === "review") {
@@ -1192,7 +1324,8 @@
       function recordOutcome(flawless) {
         var p = cur.p;
         var stages = Object.keys(cur.stageFlags).filter(function (k) { return cur.stageFlags[k]; });
-        if (session.mode === "practice") {
+        if (session.mode !== "tokkun") recordSkillProfile(p, cur.stageFlags);
+        if (session.mode !== "tokkun") {
           var stats = loadStats();
           stats[p.type].total += 1;
           if (flawless) stats[p.type].correct += 1;
@@ -1228,21 +1361,21 @@
         showView("view-result");
         var n = session.problems.length;
         var mistakes = loadMistakes();
-        if (session.mode === "practice") {
-          $("result-title").textContent = n + "もん中 " + session.flawless + "もん 手順ノーミス！";
-          $("result-msg").innerHTML = session.flawless === n
-            ? "全問 手順ノーミス、すごい！ 小数点の 位置まで ばっちり 確かめられたね。"
-            : "まちがえた 問題は とっくんに 入ったよ。とっくんで 正解すると きえるよ。";
-          $("btn-result-tokkun").classList.toggle("hidden", mistakes.length === 0);
-          $("btn-again").textContent = "もう一度 れんしゅう";
-        } else {
+        if (session.mode === "tokkun") {
           $("result-title").textContent = "とっくん " + n + "もん中 " + session.cleared + "もん クリア！";
           $("result-msg").innerHTML = mistakes.length === 0
             ? "とっくんの 問題が 全部 きえたよ。よく がんばったね！"
             : "のこりは " + mistakes.length + " もん。また とっくんで チャレンジしよう。";
-          $("btn-result-tokkun").classList.toggle("hidden", mistakes.length === 0);
           $("btn-again").textContent = "もう一度 とっくん";
+        } else {
+          var isRecommended = session.mode === "recommended";
+          $("result-title").textContent = (isRecommended ? "おすすめ " : "") + n + "もん中 " + session.flawless + "もん 手順ノーミス！";
+          $("result-msg").innerHTML = session.flawless === n
+            ? "全問 手順ノーミス！ 4つの段階で、自分の力を発揮できたね。"
+            : "つまずいた段階は記録したよ。とっくんで、もう一度確かめよう。";
+          $("btn-again").textContent = isRecommended ? "次のおすすめに挑戦" : "もう一度 れんしゅう";
         }
+        $("btn-result-tokkun").classList.toggle("hidden", mistakes.length === 0);
         playSound("practice");
         renderTokkunBadge();
       }
@@ -1262,6 +1395,49 @@
           grid.appendChild(btn);
         });
         renderTokkunBadge();
+        renderRecommendation();
+      }
+      function getLearningRecommendation() {
+        var profile = loadSkillProfile();
+        var weakest = null;
+        SKILL_KEYS.forEach(function (key) {
+          var item = profile[key];
+          var rate = item.attempts ? item.errors / item.attempts : 0;
+          // 3回以上の機会があり、2回以上つまずいた段階だけを重点候補にする。
+          if (item.attempts >= 3 && item.errors >= 2 && rate >= 0.4) {
+            if (!weakest || rate > weakest.errorRate) weakest = { focus: key, attempts: item.attempts, errorRate: rate };
+          }
+        });
+        if (weakest) {
+          var descriptions = {
+            estimate: "わる数が1より小さい問題と大きい問題をバランスよく出して、答えの大きさを見当する練習をするよ。",
+            shift: "10倍・100倍を見分ける問題を集めて、わる数を整数に直す練習をするよ。",
+            hissan: "商を立てる回数を少しおさえた問題から、筆算の流れを確かめていこう。",
+            point: "小数の商になる問題を中心に、わられる数と商の位をそろえる練習をするよ。"
+          };
+          return { kind: "focus", focus: weakest.focus, errorRate: weakest.errorRate,
+            title: SKILL_LABELS[weakest.focus] + "練習しよう", description: descriptions[weakest.focus] };
+        }
+        var ready = SKILL_KEYS.every(function (key) {
+          var item = profile[key];
+          return item.attempts >= 10 && item.errors / item.attempts <= 0.15;
+        });
+        if (ready) {
+          return { kind: "challenge", title: "発展問題に挑戦しよう",
+            description: "4つの段階で安定して進められているね。小数第2位を含む、少し手ごたえのある問題に挑戦しよう。" };
+        }
+        var total = SKILL_KEYS.reduce(function (sum, key) { return sum + profile[key].attempts; }, 0);
+        return { kind: "baseline", title: total === 0 ? "まずは ミックスで 力をチェック" : "ミックスで 練習を続けよう",
+          description: total === 0
+            ? "まずはミックス問題に挑戦。取り組みの様子を見ながら、次のおすすめを考えるよ。"
+            : "今までの練習の記録を集めているよ。いろいろな問題に取り組んで、自分の力を確かめよう。" };
+      }
+      function renderRecommendation() {
+        var recommendation = getLearningRecommendation();
+        $("recommendation-title").textContent = recommendation.title;
+        $("recommendation-description").textContent = recommendation.description;
+        $("recommendation-meta").textContent = recommendation.kind === "challenge" ? "発展 10問" : recommendation.kind === "focus" ? "重点練習 10問" : "おすすめ 10問";
+        $("btn-recommended").textContent = recommendation.kind === "challenge" ? "発展に挑戦！" : "おすすめに挑戦！";
       }
       function renderTokkunBadge() {
         var n = loadMistakes().length;
@@ -1270,11 +1446,32 @@
         badge.classList.toggle("hidden", n === 0);
         $("btn-tokkun").style.opacity = n === 0 ? ".55" : "1";
       }
-      var STAGE_NAMES = { estimate: "見当", hissan: "筆算", point: "小数点の位置" };
+      var STAGE_NAMES = { estimate: "見当", shift: "整数に直す", hissan: "筆算", point: "小数点の位置" };
+      function renderSkillProfile() {
+        var profile = loadSkillProfile();
+        var grid = $("skill-profile-grid");
+        grid.innerHTML = "";
+        SKILL_KEYS.forEach(function (key) {
+          var item = profile[key];
+          var rate = item.attempts ? Math.round(item.clean / item.attempts * 100) : 0;
+          var status = item.attempts < 3 ? "記録を集めています" : item.errors / item.attempts >= 0.4 ? "ここを中心に練習中" : rate >= 85 ? "安定してきたね" : "練習を続けよう";
+          var detail = item.attempts < 3
+            ? (item.attempts === 0 ? "これから練習の記録を集めるよ。" : "もう少し取り組んで、様子を見よう。")
+            : "1回目でできた：" + item.clean + " / " + item.attempts + "回";
+          var card = document.createElement("div");
+          card.className = "skill-card";
+          card.innerHTML = "<h4>" + SKILL_LABELS[key] + "</h4>" +
+            "<div class=\"skill-status\">" + status + "</div>" +
+            "<div class=\"skill-meter\"><div class=\"skill-meter-fill\" style=\"width:" + (item.attempts < 3 ? 0 : rate) + "%\"></div></div>" +
+            "<p>" + detail + "</p>";
+          grid.appendChild(card);
+        });
+      }
       function renderRecords() {
         $("records-learner").textContent = "（" + activeLearner + "人目）";
         var stats = loadStats();
         var mistakes = loadMistakes();
+        renderSkillProfile();
         var grid = $("stat-grid");
         grid.innerHTML = "";
         TYPE_KEYS.forEach(function (key) {
@@ -1310,12 +1507,14 @@
         });
       });
       $("btn-next").addEventListener("click", nextProblem);
+      $("btn-recommended").addEventListener("click", startRecommendedPractice);
       $("btn-quit").addEventListener("click", function () { renderTop(); showView("view-top"); });
       $("btn-tokkun").addEventListener("click", function () { if (loadMistakes().length) startTokkun(); });
       $("btn-records").addEventListener("click", renderRecords);
       $("btn-records-back").addEventListener("click", function () { renderTop(); showView("view-top"); });
       $("btn-again").addEventListener("click", function () {
         if (session && session.mode === "tokkun") startTokkun();
+        else if (session && session.mode === "recommended") startRecommendedPractice();
         else if (session) startPractice(session.type);
       });
       $("btn-result-tokkun").addEventListener("click", function () { if (loadMistakes().length) startTokkun(); });
