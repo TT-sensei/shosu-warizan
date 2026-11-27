@@ -1395,6 +1395,49 @@
           grid.appendChild(btn);
         });
         renderTokkunBadge();
+        renderRecommendation();
+      }
+      function getLearningRecommendation() {
+        var profile = loadSkillProfile();
+        var weakest = null;
+        SKILL_KEYS.forEach(function (key) {
+          var item = profile[key];
+          var rate = item.attempts ? item.errors / item.attempts : 0;
+          // 3回以上の機会があり、2回以上つまずいた段階だけを重点候補にする。
+          if (item.attempts >= 3 && item.errors >= 2 && rate >= 0.4) {
+            if (!weakest || rate > weakest.errorRate) weakest = { focus: key, attempts: item.attempts, errorRate: rate };
+          }
+        });
+        if (weakest) {
+          var descriptions = {
+            estimate: "わる数が1より小さい問題と大きい問題をバランスよく出して、答えの大きさを見当する練習をするよ。",
+            shift: "10倍・100倍を見分ける問題を集めて、わる数を整数に直す練習をするよ。",
+            hissan: "商を立てる回数を少しおさえた問題から、筆算の流れを確かめていこう。",
+            point: "小数の商になる問題を中心に、わられる数と商の位をそろえる練習をするよ。"
+          };
+          return { kind: "focus", focus: weakest.focus, errorRate: weakest.errorRate,
+            title: SKILL_LABELS[weakest.focus] + "練習しよう", description: descriptions[weakest.focus] };
+        }
+        var ready = SKILL_KEYS.every(function (key) {
+          var item = profile[key];
+          return item.attempts >= 5 && item.errors / item.attempts <= 0.15;
+        });
+        if (ready) {
+          return { kind: "challenge", title: "発展問題に挑戦しよう",
+            description: "4つの段階で安定して進められているね。小数第2位を含む、少し手ごたえのある問題に挑戦しよう。" };
+        }
+        var total = SKILL_KEYS.reduce(function (sum, key) { return sum + profile[key].attempts; }, 0);
+        return { kind: "baseline", title: total === 0 ? "まずは ミックスで 力をチェック" : "ミックスで 練習を続けよう",
+          description: total === 0
+            ? "まずはミックス問題に挑戦。取り組みの様子を見ながら、次のおすすめを考えるよ。"
+            : "今までの練習の記録を集めているよ。いろいろな問題に取り組んで、自分の力を確かめよう。" };
+      }
+      function renderRecommendation() {
+        var recommendation = getLearningRecommendation();
+        $("recommendation-title").textContent = recommendation.title;
+        $("recommendation-description").textContent = recommendation.description;
+        $("recommendation-meta").textContent = recommendation.kind === "challenge" ? "発展 10問" : recommendation.kind === "focus" ? "重点練習 10問" : "おすすめ 10問";
+        $("btn-recommended").textContent = recommendation.kind === "challenge" ? "発展に挑戦！" : "おすすめに挑戦！";
       }
       function renderTokkunBadge() {
         var n = loadMistakes().length;
@@ -1403,11 +1446,32 @@
         badge.classList.toggle("hidden", n === 0);
         $("btn-tokkun").style.opacity = n === 0 ? ".55" : "1";
       }
-      var STAGE_NAMES = { estimate: "見当", hissan: "筆算", point: "小数点の位置" };
+      var STAGE_NAMES = { estimate: "見当", shift: "整数に直す", hissan: "筆算", point: "小数点の位置" };
+      function renderSkillProfile() {
+        var profile = loadSkillProfile();
+        var grid = $("skill-profile-grid");
+        grid.innerHTML = "";
+        SKILL_KEYS.forEach(function (key) {
+          var item = profile[key];
+          var rate = item.attempts ? Math.round(item.clean / item.attempts * 100) : 0;
+          var status = item.attempts < 3 ? "記録を集めています" : item.errors / item.attempts >= 0.4 ? "ここを中心に練習中" : rate >= 85 ? "安定してきたね" : "練習を続けよう";
+          var detail = item.attempts < 3
+            ? (item.attempts === 0 ? "これから練習の記録を集めるよ。" : "もう少し取り組んで、様子を見よう。")
+            : "初回でできた：" + item.clean + " / " + item.attempts + "回";
+          var card = document.createElement("div");
+          card.className = "skill-card";
+          card.innerHTML = "<h4>" + SKILL_LABELS[key] + "</h4>" +
+            "<div class=\"skill-status\">" + status + "</div>" +
+            "<div class=\"skill-meter\"><div class=\"skill-meter-fill\" style=\"width:" + (item.attempts < 3 ? 0 : rate) + "%\"></div></div>" +
+            "<p>" + detail + "</p>";
+          grid.appendChild(card);
+        });
+      }
       function renderRecords() {
         $("records-learner").textContent = "（" + activeLearner + "人目）";
         var stats = loadStats();
         var mistakes = loadMistakes();
+        renderSkillProfile();
         var grid = $("stat-grid");
         grid.innerHTML = "";
         TYPE_KEYS.forEach(function (key) {
@@ -1443,12 +1507,14 @@
         });
       });
       $("btn-next").addEventListener("click", nextProblem);
+      $("btn-recommended").addEventListener("click", startRecommendedPractice);
       $("btn-quit").addEventListener("click", function () { renderTop(); showView("view-top"); });
       $("btn-tokkun").addEventListener("click", function () { if (loadMistakes().length) startTokkun(); });
       $("btn-records").addEventListener("click", renderRecords);
       $("btn-records-back").addEventListener("click", function () { renderTop(); showView("view-top"); });
       $("btn-again").addEventListener("click", function () {
         if (session && session.mode === "tokkun") startTokkun();
+        else if (session && session.mode === "recommended") startRecommendedPractice();
         else if (session) startPractice(session.type);
       });
       $("btn-result-tokkun").addEventListener("click", function () { if (loadMistakes().length) startTokkun(); });
