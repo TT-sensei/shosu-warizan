@@ -802,6 +802,14 @@
         startProblem();
         playSound("start");
       }
+      function startRecommendedPractice() {
+        var recommendation = getLearningRecommendation();
+        session = { mode: "recommended", type: null, recommendation: recommendation,
+          problems: buildRecommendedDeck(recommendation), idx: 0, flawless: 0, cleared: 0 };
+        showView("view-quiz");
+        startProblem();
+        playSound("start");
+      }
       function startTokkun() {
         var mistakes = loadMistakes();
         if (!mistakes.length) return;
@@ -825,13 +833,13 @@
         var typeDef = TYPES[p.type];
         cur = {
           p: p, naviId: typeDef.naviId, naviName: typeDef.navi,
-          phase: "estimate", stageFlags: {}, estimateWrong: false,
+          phase: "estimate", stageFlags: { estimate: false, shift: false, hissan: false, point: false }, estimateWrong: false,
           div: null, stepIdx: 0, filledQ: {}, consecErr: 0, shiftDone: false
         };
         $("progress-label").textContent = (session.idx + 1) + " / " + session.problems.length + " もん";
         $("progress-fill").style.width = (session.idx / session.problems.length * 100) + "%";
         $("quiz-navi").innerHTML = naviHTML(cur.naviId, "waving",
-          (session.mode === "tokkun" ? "とっくん： " : "") + typeDef.label);
+          (session.mode === "tokkun" ? "とっくん： " : session.mode === "recommended" ? "おすすめ： " : "") + typeDef.label);
         $("problem-text").textContent = p.expr + " ＝ ？";
         $("btn-next").classList.add("hidden");
         if (p.type === "review") {
@@ -916,7 +924,7 @@
                   " に なるね（答えは 同じ）。小数点が " + p.pb + "けた ずれたことも 見ておこう。" };
               beginDiv();
             } else {
-              cur.stageFlags.hissan = true;
+              cur.stageFlags.shift = true;
               playSound("wrong");
               setFeedback("bad", "おしい！",
                 p.bStr + " の 小数点の 右は " + p.pb + " けた。" + p.pb + "けた ずらして 整数に するには、何倍かな？", "retry");
@@ -1286,7 +1294,7 @@
         $("stage-area").innerHTML = html;
         setAnswerBox(p.expr + " ＝ " + p.qStr, true);
 
-        var flawless = !cur.stageFlags.estimate && !cur.stageFlags.hissan && !cur.stageFlags.point;
+        var flawless = !cur.stageFlags.estimate && !cur.stageFlags.shift && !cur.stageFlags.hissan && !cur.stageFlags.point;
         var small = divisorVal(p) < 1;
         var body = "答えは " + p.qStr + "。";
         if (p.type === "review") {
@@ -1316,7 +1324,8 @@
       function recordOutcome(flawless) {
         var p = cur.p;
         var stages = Object.keys(cur.stageFlags).filter(function (k) { return cur.stageFlags[k]; });
-        if (session.mode === "practice") {
+        recordSkillProfile(p, cur.stageFlags);
+        if (session.mode !== "tokkun") {
           var stats = loadStats();
           stats[p.type].total += 1;
           if (flawless) stats[p.type].correct += 1;
@@ -1352,21 +1361,21 @@
         showView("view-result");
         var n = session.problems.length;
         var mistakes = loadMistakes();
-        if (session.mode === "practice") {
-          $("result-title").textContent = n + "もん中 " + session.flawless + "もん 手順ノーミス！";
-          $("result-msg").innerHTML = session.flawless === n
-            ? "全問 手順ノーミス、すごい！ 小数点の 位置まで ばっちり 確かめられたね。"
-            : "まちがえた 問題は とっくんに 入ったよ。とっくんで 正解すると きえるよ。";
-          $("btn-result-tokkun").classList.toggle("hidden", mistakes.length === 0);
-          $("btn-again").textContent = "もう一度 れんしゅう";
-        } else {
+        if (session.mode === "tokkun") {
           $("result-title").textContent = "とっくん " + n + "もん中 " + session.cleared + "もん クリア！";
           $("result-msg").innerHTML = mistakes.length === 0
             ? "とっくんの 問題が 全部 きえたよ。よく がんばったね！"
             : "のこりは " + mistakes.length + " もん。また とっくんで チャレンジしよう。";
-          $("btn-result-tokkun").classList.toggle("hidden", mistakes.length === 0);
           $("btn-again").textContent = "もう一度 とっくん";
+        } else {
+          var isRecommended = session.mode === "recommended";
+          $("result-title").textContent = (isRecommended ? "おすすめ " : "") + n + "もん中 " + session.flawless + "もん 手順ノーミス！";
+          $("result-msg").innerHTML = session.flawless === n
+            ? "全問 手順ノーミス！ 4つの段階で、自分の力を発揮できたね。"
+            : "つまずいた段階は記録したよ。とっくんで、もう一度確かめよう。";
+          $("btn-again").textContent = isRecommended ? "次のおすすめに挑戦" : "もう一度 れんしゅう";
         }
+        $("btn-result-tokkun").classList.toggle("hidden", mistakes.length === 0);
         playSound("practice");
         renderTokkunBadge();
       }
