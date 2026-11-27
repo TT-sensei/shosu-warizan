@@ -1166,7 +1166,10 @@
         var small = divisorVal(p) < 1;
         var body = "答えは " + p.qStr + "。";
         if (p.type === "review") {
-          body += "商の 小数点は、わられる数の 小数点の 真上に あるね。";
+          var reviewPointReference = p.aStr.indexOf(".") >= 0
+            ? p.aStr + " の 小数点"
+            : p.aStr + " の 一の位の右にある小数点";
+          body += "商の 小数点は、わられる数 " + reviewPointReference + " の 真上に あるね。";
         } else if (cur.estimateWrong) {
           body += "見当では、わる数 " + p.bStr + " が 1より " + (small ? "小さい" : "大きい") +
             "から、答えは " + p.aStr + " より " + (small ? "大きく" : "小さく") + " なるはずだったね。次は わる数を 先に 見よう。";
