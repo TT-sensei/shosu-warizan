@@ -456,10 +456,15 @@
           if (localStorage.getItem(LS_SINGLE_MIGRATION) === "done") return;
           var selected = Number(loadJSON(LS_ACTIVE_LEARNER, 1));
           if (!Number.isInteger(selected) || selected < 1 || selected > 6) selected = 1;
-          [LS_MISTAKES, LS_STATS, LS_SKILL_PROFILE].forEach(function (key) {
-            var preferred = selected !== 1 ? localStorage.getItem(key + ".learner-" + selected) : null;
-            if (preferred === null) preferred = localStorage.getItem(key + ".learner-1");
-            if (preferred !== null) localStorage.setItem(key, preferred);
+          var keys = [LS_MISTAKES, LS_STATS, LS_SKILL_PROFILE];
+          var selectedHasData = selected !== 1 && keys.some(function (key) {
+            return localStorage.getItem(key + ".learner-" + selected) !== null;
+          });
+          var sourceLearner = selectedHasData ? selected : 1;
+          keys.forEach(function (key) {
+            var source = localStorage.getItem(key + ".learner-" + sourceLearner);
+            if (source !== null) localStorage.setItem(key, source);
+            else if (selectedHasData) localStorage.removeItem(key);
           });
           localStorage.removeItem(LS_ACTIVE_LEARNER);
           localStorage.setItem(LS_SINGLE_MIGRATION, "done");
