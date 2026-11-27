@@ -35,7 +35,7 @@
 
 ## 保存（この端末のブラウザー内のみ）
 
-- 学習記録は1人目〜6人目の6枠に分けて保存できる。名前やアカウント登録は不要。
+- 学習記録は1人目〜6人目の6枠に分けて保存できる。名前やアカウント登録は不要。これは記録を整理するための切替で、本人確認やパスワードによる保護ではない。
 - `shosuWarizan.mistakes.v1.learner-N`：学習者ごとの間違えた問題と、つまずいた段階（estimate／hissan／point）
 - `shosuWarizan.stats.v1.learner-N`：学習者ごとの種類別実施数と手順ノーミス数
 - `shosuWarizan.settings.v1`：音のON/OFF（端末共通）
