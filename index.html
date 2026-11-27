@@ -49,11 +49,6 @@
       .chip-grade { background: var(--primary); color: #fff; border-radius: 999px; padding: 5px 14px; font-size: 14px; font-weight: 700; }
       .sound-toggle { margin-left: auto; border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 16px; font-size: 15px; font-weight: 700; cursor: pointer; color: var(--ink); }
       .sound-toggle:active { transform: scale(.97); }
-      .learner-picker { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: -2px 0 14px; padding: 10px 14px; background: #fff; border: 2px solid var(--line); border-radius: 14px; }
-      .learner-picker label { font-size: 14px; font-weight: 800; color: var(--muted); }
-      .learner-picker select { min-width: 124px; border: 2px solid var(--line); border-radius: 10px; padding: 8px 12px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; font-weight: 700; }
-      .learner-picker small { color: var(--muted); font-size: 12px; }
-
       .home-lead { display: flex; gap: 18px; align-items: center; background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 16px 20px; }
       .home-lead-copy { flex: 1; min-width: 260px; }
       .lead { font-size: 18px; line-height: 1.7; margin: 0 0 8px; }
@@ -245,15 +240,6 @@
           <button class="sound-toggle" id="btn-sound" aria-pressed="true">🔊 音 ON</button>
         </header>
 
-        <div class="learner-picker">
-          <label for="learner-select">学習記録を使う人</label>
-          <select id="learner-select" aria-label="学習記録を使う人">
-            <option value="1">1人目</option><option value="2">2人目</option><option value="3">3人目</option>
-            <option value="4">4人目</option><option value="5">5人目</option><option value="6">6人目</option>
-          </select>
-          <small>選んだ人ごとに記録を分けます（本人確認やパスワードはありません）。</small>
-        </div>
-
         <div class="home-lead">
           <div class="home-lead-copy">
             <p class="lead">小数 ÷ 小数は、答えの大きさを見当してから筆算へ。最後は、わられる数と商の小数点の位置をそろえて確かめよう。1回は10問です。</p>
@@ -313,7 +299,7 @@
           </button>
         </div>
 
-        <footer class="note">まちがえた 問題と きろくは、この タブレットの 中だけに 保存されます。学習記録を使う人を切り替えると、それぞれの記録を見られます。</footer>
+        <footer class="note">まちがえた 問題と きろくは、この ブラウザーの 中だけに 保存されます。別の端末やブラウザーとは共有されません。</footer>
       </section>
 
       <!-- ============ 練習画面 ============ -->
@@ -387,7 +373,7 @@
           <button class="btn ghost" id="btn-records-back">← トップへ もどる</button>
         </div>
         <div class="panel" style="background:transparent;border:none;padding:0;">
-          <h2 style="font-size:24px;margin:4px 0 14px;">れんしゅうの きろく <small id="records-learner" style="font-size:14px;color:var(--muted);font-weight:700;"></small></h2>
+          <h2 style="font-size:24px;margin:4px 0 14px;">れんしゅうの きろく</h2>
           <section class="skill-profile-section" aria-labelledby="skill-profile-title">
             <h3 id="skill-profile-title">計算の力のようす</h3>
             <p class="skill-profile-intro">それぞれの段階で、ヒントを使う前に自分で進められたかを記録しています。回数が少ないうちは、得意・苦手を決めつけません。</p>
@@ -395,10 +381,10 @@
           </section>
           <section class="backup-section" aria-labelledby="backup-title">
             <h3 id="backup-title">学習記録のバックアップ</h3>
-            <p>この人の記録をファイルに保存できます。別の端末では、記録を入れたい人を選んでから読み込んでください。読み込むと、選択中の人の記録に置き換わります。</p>
+            <p>このブラウザーに保存した学習記録をファイルにできます。別の端末へ移すときにも使えます。読み込むと、今ある記録に置き換わります。</p>
             <div class="backup-actions">
-              <button class="btn" id="btn-export-records" type="button">この人の記録を保存</button>
-              <button class="btn" id="btn-import-records" type="button">記録を読み込む</button>
+              <button class="btn" id="btn-export-records" type="button">学習記録を保存</button>
+              <button class="btn" id="btn-import-records" type="button">学習記録を読み込む</button>
               <input id="input-import-records" type="file" accept=".json,application/json" hidden />
             </div>
             <p class="backup-status" id="backup-status" role="status" aria-live="polite"></p>
@@ -444,12 +430,12 @@
       };
       var TYPE_KEYS = ["review", "basic", "step2", "mix"];
 
-      /* ================= 保存（この端末の中だけ） ================= */
+      /* ================= 保存（このブラウザーの中だけ） ================= */
       var LS_MISTAKES = "shosuWarizan.mistakes.v1";
       var LS_STATS = "shosuWarizan.stats.v1";
       var LS_SETTINGS = "shosuWarizan.settings.v1";
-      var LS_ACTIVE_LEARNER = "shosuWarizan.activeLearner.v1";
       var LS_SKILL_PROFILE = "shosuWarizan.skillProfile.v1";
+      var LS_ACTIVE_LEARNER = "shosuWarizan.activeLearner.v1";
 
       function loadJSON(key, fallback) {
         try {
@@ -462,25 +448,22 @@
       function saveJSON(key, value) {
         try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
       }
-      function readActiveLearner() {
-        var n = Number(loadJSON(LS_ACTIVE_LEARNER, 1));
-        return Number.isInteger(n) && n >= 1 && n <= 6 ? n : 1;
-      }
-      var activeLearner = readActiveLearner();
-      function learnerDataKey(key) { return key + ".learner-" + activeLearner; }
-      function migrateLegacyRecords() {
-        if (activeLearner !== 1) return;
+      // 以前の6枠のうち、最後に選ばれていた枠の記録を1つの保存先へ引き継ぐ。
+      // 旧データは削除せず残し、今後は共通キーだけを使う。
+      function migrateToSingleLearner() {
         try {
-          [LS_MISTAKES, LS_STATS].forEach(function (key) {
-            var nextKey = key + ".learner-1";
-            var oldValue = localStorage.getItem(key);
-            if (localStorage.getItem(nextKey) === null && oldValue !== null) {
-              localStorage.setItem(nextKey, oldValue);
-            }
+          var selected = Number(loadJSON(LS_ACTIVE_LEARNER, 1));
+          if (!Number.isInteger(selected) || selected < 1 || selected > 6) selected = 1;
+          [LS_MISTAKES, LS_STATS, LS_SKILL_PROFILE].forEach(function (key) {
+            var preferred = selected !== 1 ? localStorage.getItem(key + ".learner-" + selected) : null;
+            if (preferred === null) preferred = localStorage.getItem(key + ".learner-1");
+            if (preferred !== null) localStorage.setItem(key, preferred);
           });
+          localStorage.removeItem(LS_ACTIVE_LEARNER);
         } catch (e) { /* 保存できない環境でも学習は続ける */ }
       }
-      migrateLegacyRecords();
+      migrateToSingleLearner();
+      function learnerDataKey(key) { return key; }
       function loadMistakes() {
         var m = loadJSON(learnerDataKey(LS_MISTAKES), []);
         return Array.isArray(m) ? m : [];
@@ -516,10 +499,16 @@
         var errors = recent.filter(function (v) { return v === true; }).length;
         return { attempts: recent.length, errors: errors, clean: recent.length - errors };
       }
+      function getProblemKind(problem) {
+        if (problem.kind === "review" || problem.kind === "basic" || problem.kind === "step2") return problem.kind;
+        if (problem.type === "review" || problem.pb === 0) return "review";
+        return problem.pb === 1 ? "basic" : "step2";
+      }
+
       function recordSkillProfile(problem, flags) {
         var profile = loadSkillProfile();
         var applicable = [];
-        if (problem.type !== "review") applicable.push("estimate");
+        if (getProblemKind(problem) !== "review") applicable.push("estimate");
         if (problem.pb > 0) applicable.push("shift");
         applicable.push("hissan");
         // 整数の商では小数点の位置を選ばないため、技能評価の対象にしない。
@@ -619,6 +608,8 @@
         var Dint = shift >= 0 ? p.da * Math.pow(10, shift) : p.da;
         var pr = shift >= 0 ? 0 : -shift;
         var DS = String(Dint);
+        // 0.6 のように整数部分が0でも、一の位の0と小数点を筆算上に表示できるようにする。
+        while (DS.length <= pr) DS = "0" + DS;
         var pointPos = DS.length - pr; // 小数点は左から pointPos けたの後
         var steps = [];
         var r = 0, started = false, terminated = false;
@@ -649,7 +640,8 @@
 
       /* ================= 問題生成 =================
          商と わる数を先に決めて わられる数を逆算するので、必ず割り切れる。 */
-      function makeFromQ(type, db, pb, qd, qp) {
+      function makeFromQ(type, kind, db, pb, qd, qp) {
+        // 商とわる数から、わられる数を逆算する。わられる数は小数第2位まで。
         var prod = db * qd;
         var da = prod, pa = pb + qp;
         while (pa > 0 && da % 10 === 0) { da = Math.floor(da / 10); pa--; }
@@ -662,66 +654,81 @@
         var qq = computeQ(da, pa, db, pb);
         if (!qq || qq.qd !== qd || qq.qp !== qp) return null;
         var p = {
-          type: type, da: da, pa: pa, db: db, pb: pb, qd: qd, qp: qp,
+          type: type, kind: kind, da: da, pa: pa, db: db, pb: pb, qd: qd, qp: qp,
           aStr: fmtDec(da, pa), bStr: fmtDec(db, pb), qStr: fmtDec(qd, qp),
           expr: fmtDec(da, pa) + " ÷ " + fmtDec(db, pb)
         };
         var div = buildDivSteps(p);
         if (!div.terminated) return null;
-        if (div.steps.length > 5) return null;      // 立てる商は5回まで（1画面に収める）
-        if (div.maxI > 6) return null;              // 筆算の横幅を抑える
+        if (div.steps.length > 5) return null;
+        if (div.maxI > 6) return null;
         if (String(qd).length + qp > 7) return null;
         return p;
       }
-      function genCandidate(type, kind, wantSmall) {
+      function genCandidate(type, kind, wantSmall, wantQuotientSmall) {
         var db, pb, qd, qp;
         if (kind === "review") {
-          pb = 0; db = randInt(2, 9);
-          qp = pick([1, 1, 2]);
-          qd = qp === 1 ? randInt(12, 120) : randInt(105, 999);
-          if (qd % 10 === 0) return null;
+          pb = 0;
+          db = randInt(2, 9);
         } else if (kind === "basic") {
           pb = 1;
-          if (wantSmall) db = randInt(2, 9);                       // 0.2〜0.9
-          else { do { db = randInt(12, 49); } while (db % 10 === 0); } // 1.2〜4.9
-          qp = pick([0, 1, 1, 2]);
-          if (qp === 0) qd = randInt(2, 30);
-          else if (qp === 1) qd = randInt(12, 99);
-          else qd = randInt(105, 395);
-          if (qd % 10 === 0) return null;
-        } else { // step2
+          if (wantSmall) db = randInt(2, 9);
+          else { do { db = randInt(12, 49); } while (db % 10 === 0); }
+        } else {
           pb = 2;
-          if (wantSmall) { do { db = randInt(12, 99); } while (db % 10 === 0); }   // 0.12〜0.99
-          else { do { db = randInt(102, 299); } while (db % 10 === 0); }            // 1.02〜2.99
-          qp = pick([0, 1, 1, 2]);
-          if (qp === 0) qd = randInt(2, 28);
-          else if (qp === 1) qd = randInt(12, 99);
-          else qd = randInt(105, 295);
-          if (qd % 10 === 0) return null;
+          if (wantSmall) { do { db = randInt(12, 99); } while (db % 10 === 0); }
+          else { do { db = randInt(102, 299); } while (db % 10 === 0); }
         }
-        return makeFromQ(type, db, pb, qd, qp);
+
+        if (wantQuotientSmall) {
+          // 0.1〜0.99。商が1未満になる問題も意図して作る。
+          qp = pick([1, 1, 2]);
+          qd = qp === 1 ? randInt(1, 9) : randInt(10, 99);
+        } else {
+          qp = pick([0, 1, 1, 2]);
+          if (kind === "step2") {
+            qd = qp === 0 ? randInt(2, 28) : qp === 1 ? randInt(12, 99) : randInt(105, 295);
+          } else if (kind === "review") {
+            qd = qp === 0 ? randInt(2, 30) : qp === 1 ? randInt(12, 120) : randInt(105, 999);
+          } else {
+            qd = qp === 0 ? randInt(2, 30) : qp === 1 ? randInt(12, 99) : randInt(105, 395);
+          }
+        }
+        // qd が10の倍数でも整数の商なら有効。小数表記が短くなる場合だけ makeFromQ が除外する。
+        return makeFromQ(type, kind, db, pb, qd, qp);
       }
       function buildDeck(type) {
         var problems = [], seen = {};
-        function push(kind, wantSmall) {
-          for (var t = 0; t < 80; t++) {
-            var p = genCandidate(type, kind, wantSmall);
+        function push(kind, wantSmall, wantQuotientSmall) {
+          for (var t = 0; t < 600; t++) {
+            var p = genCandidate(type, kind, wantSmall, wantQuotientSmall);
             if (p && !seen[p.expr]) { seen[p.expr] = true; problems.push(p); return; }
           }
         }
         var i;
         if (type === "review") {
-          for (i = 0; i < 10; i++) push("review", false);
+          // 小数÷整数でも、商が1未満になる場合を含める。
+          for (i = 0; i < 10; i++) push("review", false, i < 4);
         } else if (type === "basic" || type === "step2") {
-          // わる数が1より小さい型を必ず2問入れる
-          var flags = shuffle([true, true, false, false, false, false, false, false, false, false]);
-          for (i = 0; i < 10; i++) push(type, flags[i]);
-        } else { // mix
-          push("basic", true); push("step2", true);
-          push("review", false); push("review", false);
-          push("basic", false); push("basic", false); push("basic", false);
-          push("step2", false); push("step2", false); push("step2", false);
-          problems = shuffle(problems);
+          // わる数が1未満の問題を2問、商が1未満の問題を3問入れる。
+          // 4つの組合せ（わる数／商がそれぞれ1より小さい・大きい）を扱う。
+          var specs = [
+            [true, true], [true, false],
+            [false, true], [false, true],
+            [false, false], [false, false], [false, false],
+            [false, false], [false, false], [false, false]
+          ];
+          shuffle(specs).forEach(function (spec) { push(type, spec[0], spec[1]); });
+        } else {
+          // ミックス：復習・第1位・第2位を含み、商が1未満の問題も含める。
+          var mixSpecs = [
+            ["review", false, true], ["review", false, false],
+            ["basic", true, true], ["basic", false, true],
+            ["basic", false, false], ["basic", false, false],
+            ["step2", true, false], ["step2", false, true],
+            ["step2", false, false], ["step2", false, false]
+          ];
+          shuffle(mixSpecs).forEach(function (spec) { push(spec[0], spec[1], spec[2]); });
         }
         return problems;
       }
@@ -730,44 +737,41 @@
       function buildRecommendedDeck(recommendation) {
         if (!recommendation || recommendation.kind === "baseline") return buildDeck("mix");
         var problems = [], seen = {};
-        function add(kind, wantSmall, accept) {
+        function add(kind, wantSmall, accept, wantQuotientSmall) {
           var added = false;
-          for (var attempt = 0; attempt < 1400 && !added; attempt++) {
-            var p = genCandidate(kind, kind, wantSmall);
+          for (var attempt = 0; attempt < 1800 && !added; attempt++) {
+            var p = genCandidate(kind, kind, wantSmall, wantQuotientSmall);
             if (!p || seen[p.expr]) continue;
             if (accept && !accept(p)) continue;
             seen[p.expr] = true;
             problems.push(p);
             added = true;
           }
-          if (!added && accept) add(kind, wantSmall, null);
+          if (!added && accept) add(kind, wantSmall, null, wantQuotientSmall);
         }
         var i;
         if (recommendation.focus === "estimate") {
-          // わる数が1より小さい問題と大きい問題を同数にする。
-          for (i = 0; i < 10; i++) add(i % 2 === 0 ? "basic" : "step2", i < 5);
+          for (i = 0; i < 10; i++) add(i % 2 === 0 ? "basic" : "step2", i < 5, null, i % 3 === 0);
         } else if (recommendation.focus === "shift") {
-          // 10倍する型と100倍する型を5問ずつにする。
-          for (i = 0; i < 10; i++) add(i < 5 ? "basic" : "step2", i % 2 === 0);
+          for (i = 0; i < 10; i++) add(i < 5 ? "basic" : "step2", i % 2 === 0, null, i % 3 === 0);
         } else if (recommendation.focus === "hissan") {
-          // 商を立てる回数を抑えた問題から、筆算の流れを確かめる。
           var maxSteps = recommendation.errorRate >= 0.55 ? 2 : 3;
           for (i = 0; i < 10; i++) {
             var hKind = i % 4 === 3 ? "step2" : "basic";
             add(hKind, i % 3 === 0, function (p) {
               var count = buildDivSteps(p).steps.length;
-              return count >= 2 && count <= maxSteps;
-            });
+              return count >= 1 && count <= maxSteps;
+            }, i % 3 === 1);
           }
         } else if (recommendation.focus === "point") {
-          // 商が小数になる問題を8問、整数になる問題も2問入れる。
           for (i = 0; i < 10; i++) {
             var pKind = i % 2 === 0 ? "basic" : "step2";
-            add(pKind, i % 3 === 0, i < 8 ? function (p) { return p.qp > 0; } : function (p) { return p.qp === 0; });
+            add(pKind, i % 3 === 0, function (p) { return p.qp > 0; }, i % 3 === 1);
           }
         } else if (recommendation.kind === "challenge") {
-          // 第2位までのわる数を中心に、筆算の段階が少し多い問題に挑戦する。
-          for (i = 0; i < 10; i++) add("step2", i < 5, function (p) { return buildDivSteps(p).steps.length >= 3; });
+          for (i = 0; i < 10; i++) add("step2", i < 5, function (p) {
+            return buildDivSteps(p).steps.length >= 3;
+          }, i % 3 === 0);
         }
         if (problems.length < 10) {
           var fallback = buildDeck("mix");
@@ -777,12 +781,11 @@
         }
         for (var tries = 0; problems.length < 10 && tries < 5000; tries++) {
           var extraKind = tries % 2 === 0 ? "basic" : "step2";
-          var extra = genCandidate(extraKind, extraKind, tries % 3 === 0);
+          var extra = genCandidate(extraKind, extraKind, tries % 3 === 0, tries % 4 === 0);
           if (extra && !seen[extra.expr]) { seen[extra.expr] = true; problems.push(extra); }
         }
         return shuffle(problems).slice(0, 10);
       }
-
       /* ================= ナビキャラ ================= */
       var NAVI_WEB = "https://tt-sensei.github.io/navi-character-/assets/web/characters";
       function naviImageHTML(naviId, pose) {
@@ -846,7 +849,8 @@
         var problems = mistakes.map(function (m) {
           var qq = computeQ(m.da, m.pa, m.db, m.pb);
           return {
-            type: m.type, da: m.da, pa: m.pa, db: m.db, pb: m.pb,
+            type: m.type, kind: m.kind || (m.pb === 0 ? "review" : m.pb === 1 ? "basic" : "step2"),
+            da: m.da, pa: m.pa, db: m.db, pb: m.pb,
             qd: qq.qd, qp: qq.qp,
             aStr: fmtDec(m.da, m.pa), bStr: fmtDec(m.db, m.pb), qStr: fmtDec(qq.qd, qq.qp),
             expr: m.expr
@@ -872,7 +876,7 @@
           (session.mode === "tokkun" ? "とっくん： " : session.mode === "recommended" ? "おすすめ： " : "") + typeDef.label);
         $("problem-text").textContent = p.expr + " ＝ ？";
         $("btn-next").classList.add("hidden");
-        if (p.type === "review") {
+        if (getProblemKind(p) === "review") {
           // 小数÷整数の復習では、わる数が必ず1より大きくなるため、大小の見当問題は省略する。
           renderHissanPhase();
           setFeedback("", "", "小数を 整数で わる 筆算を しよう。商の 小数点は、わられる数の 小数点の 真上に 打つよ。", "hint");
@@ -1327,7 +1331,7 @@
         var flawless = !cur.stageFlags.estimate && !cur.stageFlags.shift && !cur.stageFlags.hissan && !cur.stageFlags.point;
         var small = divisorVal(p) < 1;
         var body = "答えは " + p.qStr + "。";
-        if (p.type === "review") {
+        if (getProblemKind(p) === "review") {
           var reviewPointReference = p.aStr.indexOf(".") >= 0
             ? p.aStr + " の 小数点"
             : p.aStr + " の 一の位の右にある小数点";
@@ -1367,7 +1371,7 @@
               if (mistakes[i].type === p.type && mistakes[i].expr === p.expr) { rec = mistakes[i]; break; }
             }
             if (rec) { rec.stages = stages; }
-            else mistakes.push({ type: p.type, da: p.da, pa: p.pa, db: p.db, pb: p.pb, expr: p.expr, stages: stages });
+            else mistakes.push({ type: p.type, kind: getProblemKind(p), da: p.da, pa: p.pa, db: p.db, pb: p.pb, expr: p.expr, stages: stages });
             saveJSON(learnerDataKey(LS_MISTAKES), mistakes);
           }
         } else { // tokkun
@@ -1401,7 +1405,7 @@
           var isRecommended = session.mode === "recommended";
           $("result-title").textContent = (isRecommended ? "おすすめ " : "") + n + "もん中 " + session.flawless + "もん 手順ノーミス！";
           $("result-msg").innerHTML = session.flawless === n
-            ? "全問 手順ノーミス！ 4つの段階で、自分の力を発揮できたね。"
+            ? "全問 手順ノーミス！ 取り組んだ手順を、最後まで正確に進められたね。"
             : "つまずいた段階は記録したよ。とっくんで、もう一度確かめよう。";
           $("btn-again").textContent = isRecommended ? "次のおすすめに挑戦" : "もう一度 れんしゅう";
         }
@@ -1511,7 +1515,6 @@
             app: "tt-sensei-shosu-warizan",
             version: 1,
             exportedAt: new Date().toISOString(),
-            learner: activeLearner,
             data: {
               mistakes: loadMistakes(),
               stats: loadStats(),
@@ -1524,12 +1527,12 @@
           var stamp = new Date();
           var ymd = stamp.getFullYear() + String(stamp.getMonth() + 1).padStart(2, "0") + String(stamp.getDate()).padStart(2, "0");
           link.href = url;
-          link.download = "shosu-warizan-learner-" + activeLearner + "-" + ymd + ".json";
+          link.download = "shosu-warizan-records-" + ymd + ".json";
           document.body.appendChild(link);
           link.click();
           link.remove();
           window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-          $("backup-status").textContent = activeLearner + "人目の記録を保存するファイルを作成したよ。";
+          $("backup-status").textContent = "学習記録を保存するファイルを作成したよ。";
         } catch (e) {
           $("backup-status").textContent = "ファイルを作成できませんでした。このブラウザーの設定を確認してね。";
         }
@@ -1553,7 +1556,9 @@
             throw new Error("間違い直しの記録に読み込めないデータがあります。");
           }
           return {
-            type: m.type, da: m.da, pa: m.pa, db: m.db, pb: m.pb,
+            type: m.type,
+            kind: ["review", "basic", "step2"].indexOf(m.kind) >= 0 ? m.kind : (m.pb === 0 ? "review" : m.pb === 1 ? "basic" : "step2"),
+            da: m.da, pa: m.pa, db: m.db, pb: m.pb,
             expr: fmtDec(m.da, m.pa) + " ÷ " + fmtDec(m.db, m.pb),
             stages: Array.isArray(m.stages) ? m.stages.filter(function (stage) {
               return allowedStages.indexOf(stage) >= 0;
@@ -1598,10 +1603,7 @@
           try {
             var payload = JSON.parse(String(reader.result || ""));
             var records = validateBackupPayload(payload);
-            var source = Number.isInteger(payload.learner) && payload.learner >= 1 && payload.learner <= 6
-              ? payload.learner + "人目" : "保存ファイル";
-            if (!window.confirm(source + "の記録を、現在選んでいる" + activeLearner +
-                "人目の記録に読み込みます。今ある記録は置き換わります。よろしいですか？")) {
+            if (!window.confirm("バックアップの学習記録を、このブラウザーの記録に読み込みます。今ある記録は置き換わります。よろしいですか？")) {
               $("backup-status").textContent = "読み込みをキャンセルしたよ。";
               return;
             }
@@ -1622,7 +1624,7 @@
               });
               throw new Error("この端末に保存できませんでした。空き容量やブラウザーの設定を確認してね。");
             }
-            $("backup-status").textContent = activeLearner + "人目の記録を読み込んだよ。";
+            $("backup-status").textContent = "学習記録を読み込んだよ。";
             renderRecords();
           } catch (e) {
             $("backup-status").textContent = e && e.message ? e.message : "ファイルを読み込めませんでした。";
@@ -1635,7 +1637,6 @@
       }
 
       function renderRecords() {
-        $("records-learner").textContent = "（" + activeLearner + "人目）";
         var stats = loadStats();
         var mistakes = loadMistakes();
         renderSkillProfile();
@@ -1698,14 +1699,6 @@
         saveSettings();
         renderSoundBtn();
         if (settings.sound) playSound("decide");
-      });
-      $("learner-select").value = String(activeLearner);
-      $("learner-select").addEventListener("change", function () {
-        var nextLearner = Number(this.value);
-        if (!Number.isInteger(nextLearner) || nextLearner < 1 || nextLearner > 6) return;
-        activeLearner = nextLearner;
-        saveJSON(LS_ACTIVE_LEARNER, activeLearner);
-        renderTop();
       });
       renderSoundBtn();
       renderTop();
