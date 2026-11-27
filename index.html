@@ -229,7 +229,7 @@
 
         <div class="home-lead">
           <div class="home-lead-copy">
-            <p class="lead">まずは 答えが もとの数より 大きくなるか 小さくなるかを 見当して、筆算で わり算を して、さいごに 小数点の 位置を 自分で 確かめよう。1回は 10問です。</p>
+            <p class="lead">小数 ÷ 小数は、答えの大きさを見当してから筆算へ。最後は、わられる数と商の小数点の位置をそろえて確かめよう。1回は10問です。</p>
             <nav class="map-links" aria-label="学びの地図">
               <a href="https://tt-sensei.github.io/jp-learning-taxonomy/site/v2/#topic=jp.elem.math.decimal-multiply-divide" target="_blank" rel="noopener">小数のかけ算・わり算（学びの地図）</a>
             </nav>
@@ -1068,7 +1068,7 @@
         var digitColumns = maxPosition - minPosition;
         var gridStyle = "grid-template-columns: repeat(" + digitColumns + ", 50px 22px) 50px;";
         var html = '<div class="point-align-wrap">';
-        html += '<div class="point-align-caption">ずらした後の わられる数</div>';
+        html += '<div class="point-align-caption">ずらした後の わられる数（整数は一の位の右）</div>';
         html += '<div class="point-align-grid" style="' + gridStyle + '">';
         for (var i = 0; i < dividendDigits.length; i++) {
           var dCol = 2 * (i - minPosition) + 1;
@@ -1134,12 +1134,15 @@
 
       /* 小数点の位置の「わけ」：商の小数点は、ずらした後のわられる数の小数点の真上 */
       function whyHTML(p) {
-        if (p.pb === 0) {
-          return '<div class="p-why">わけ： 小数 ÷ 整数では、商の 小数点は わられる数 <b>' + p.aStr + '</b> の 小数点の <b>真上</b>に 打つよ。</div>';
-        }
         var div = buildDivSteps(p);
+        var pointReference = div.Dstr.indexOf(".") >= 0
+          ? '<b>' + div.Dstr + '</b> の 小数点'
+          : '<b>' + div.Dstr + '</b> の 一の位の右にある小数点';
+        if (p.pb === 0) {
+          return '<div class="p-why">わけ： 小数 ÷ 整数では、商の 小数点は わられる数 ' + pointReference + ' の <b>真上</b>に 打つよ。</div>';
+        }
         return '<div class="p-why">わけ： ' + p.aStr + ' ÷ ' + p.bStr + ' は、両方を <b>' + Math.pow(10, p.pb) + '倍</b>して <b>' +
-          div.Dstr + ' ÷ ' + p.db + '</b> に 直したね。<br>商の 小数点は、' + div.Dstr + ' の 小数点の <b>真上</b>に 打つよ。</div>';
+          div.Dstr + ' ÷ ' + p.db + '</b> に 直したね。<br>商の 小数点は、' + pointReference + ' の <b>真上</b>に 打つよ。</div>';
       }
 
       /* ---------- 問題の完了 ---------- */
