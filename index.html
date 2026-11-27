@@ -118,6 +118,10 @@
       .h-cell.pt { width: calc(var(--cell) * 0.3); font-size: calc(var(--cell) * 0.57); font-weight: 900; border-color: transparent; background: transparent; }
       .h-cell.work { height: calc(var(--cell) * 0.56); font-size: calc(var(--cell) * 0.5); }
       .h-cell.target { background: var(--amber-soft); border: 3px solid var(--amber); color: #b97a0f; animation: pulse 1s infinite; }
+      .h-cell.target-prod { background: #e7f5ec; border: 3px solid var(--good); color: var(--good); animation: prodPulse 1s infinite; }
+      .h-cell.target-rem { background: #fbeee6; border: 3px solid #c75b27; color: #c75b27; animation: remPulse 1s infinite; }
+      @keyframes prodPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(30,158,87,.45); } 50% { box-shadow: 0 0 0 7px rgba(30,158,87,0); } }
+      @keyframes remPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(199,91,39,.45); } 50% { box-shadow: 0 0 0 7px rgba(199,91,39,0); } }
       .h-cell.filled { color: var(--primary-dark); }
       .h-cell.dim { color: #a9c3d6; }
       .h-cell.prefill { color: var(--muted); }
@@ -127,6 +131,11 @@
       .h-cell.down { color: #7a5faa; }
       .h-cell.src-mark { color: #7a5faa; border-color: #b7a6dd; background: #f1ecfa; }
       .h-cell.down-live { background: #f1ecfa; border-color: #b7a6dd; }
+      .h-cell.src-tap { cursor: pointer; animation: srcPulse 1.1s infinite; }
+      .h-cell.dst-wait { background: #faf8fd; border-style: dashed; }
+      .h-cell.drop-in { animation: dropIn .45s ease; }
+      @keyframes srcPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(122,95,170,.5); } 50% { box-shadow: 0 0 0 7px rgba(122,95,170,0); } }
+      @keyframes dropIn { 0% { transform: translateY(-65%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
       .orosu-arrow { position: absolute; left: 0; top: 0; pointer-events: none; }
       .h-line { border-bottom: 3px solid var(--ink); height: 4px; }
       .h-part { border-bottom: 3px solid var(--ink); height: 3px; }
@@ -266,7 +275,7 @@
         .home-group { display: none; }
       }
       @media (prefers-reduced-motion: reduce) {
-        .anim-pop, .anim-shake, .h-cell.target { animation: none !important; }
+        .anim-pop, .anim-shake, .h-cell.target, .h-cell.src-tap, .h-cell.drop-in, .h-cell.target-prod, .h-cell.target-rem { animation: none !important; }
       }
     </style>
   </head>
@@ -957,6 +966,8 @@
         cur.phase = "hissan";
         cur.div = buildDivSteps(p);
         cur.stepIdx = 0; cur.filledQ = {}; cur.consecErr = 0; cur.reveal = null;
+        cur.orosuDone = false; cur.orosuWrongs = 0;
+        cur.subFilled = {}; cur.subPos = 0; cur.subErr = 0; cur.subLock = false;
         setKeypadEnabled(true);
         drawDiv();
         if (cur.estMsg) {
@@ -989,6 +1000,7 @@
         var div = cur.div;
         var cols = divCols();
         var step = div.steps[cur.stepIdx];
+        var orosuWait = !!(cur.reveal && cur.reveal.stage === 2 && !cur.orosuDone);
         var tmpl = "calc(var(--cell) * 1.7) " + cols.map(function (c) { return c.t === "p" ? "calc(var(--cell) * 0.3)" : "var(--cell)"; }).join(" ");
         function cell(content, cls, attr) { return '<span class="h-cell ' + (cls || "") + '"' + (attr || "") + '>' + (content === "" || content == null ? "&nbsp;" : content) + "</span>"; }
         function workCell(content, cls, attr) { return '<span class="h-cell work ' + (cls || "") + '"' + (attr || "") + '>' + (content === "" || content == null ? "&nbsp;" : content) + "</span>"; }
@@ -1004,7 +1016,7 @@
           if (c.t === "p") { html += cell("", "pt"); continue; }
           i = c.i;
           if (cur.filledQ[i] != null) html += cell(cur.filledQ[i], "filled");
-          else if (step && step.i === i) html += cell("?", "target");
+          else if (step && step.i === i && !cur.reveal) html += cell("?", "target");
           else if (div.prefillZero && i === div.pointPos - 1) html += cell("0", "prefill");
           else html += cell("");
         }
@@ -1021,8 +1033,11 @@
           else if (step && i <= step.i) { dContent = "0"; dCls = "dim"; }
           else dContent = "";
           if (orosuStep && i === orosuStep.i + 1 && dContent !== "") {
-            dCls = (dCls ? dCls + " " : "") + "src-mark";
+            dCls = (dCls ? dCls + " " : "") + "src-mark" + (orosuWait ? " src-tap" : "");
             dAttr = ' data-orosu-src="1"';
+          }
+          if (orosuWait && dContent !== "") {
+            dAttr += ' data-orosu-pos="' + i + '"';
           }
           html += cell(dContent, dCls, dAttr);
         }
@@ -1031,14 +1046,21 @@
           var st = div.steps[s];
           var prodStr = String(st.prod);
           var prodStart = st.i - (prodStr.length - 1);
-          // 積の行
+          // 積の行（かける段階では、子どもの入力をマスごとに表示する）
+          var prodInput = !!(cur.reveal && cur.reveal.step === s && cur.reveal.stage === 0);
           html += '<span class="h-cell sign2 work">&nbsp;</span>';
           for (k = 0; k < cols.length; k++) {
             c = cols[k];
             if (c.t === "p") { html += workCell("", "pt"); continue; }
             i = c.i;
-            var pd = i >= prodStart && i <= st.i ? prodStr[i - prodStart] : "";
-            html += workCell(pd, pd !== "" ? "prod" : "");
+            if (prodInput && i >= prodStart && i <= st.i) {
+              if (cur.subFilled && cur.subFilled[i] != null) html += workCell(cur.subFilled[i], "prod");
+              else if (i === cur.subPos) html += workCell("?", "prod target-prod");
+              else html += workCell("", "");
+            } else {
+              var pd = i >= prodStart && i <= st.i ? prodStr[i - prodStart] : "";
+              html += workCell(pd, pd !== "" ? "prod" : "");
+            }
           }
           if (!(cur.reveal && cur.reveal.step === s && cur.reveal.stage === 0)) {
           // 線
@@ -1052,10 +1074,24 @@
             c = cols[k];
             if (c.t === "p") { html += workCell("", "pt"); continue; }
             i = c.i;
-            if (i >= remStart && i <= st.i) html += workCell(remStr[i - remStart], "rem");
+            if (i >= remStart && i <= st.i) {
+              if (cur.reveal && cur.reveal.step === s && cur.reveal.stage === 1) {
+                // ひく段階では、子どもの入力をマスごとに表示する
+                if (cur.subFilled && cur.subFilled[i] != null) html += workCell(cur.subFilled[i], "rem");
+                else if (i === cur.subPos) html += workCell("?", "rem target-rem");
+                else html += workCell("", "");
+              } else {
+                html += workCell(remStr[i - remStart], "rem");
+              }
+            }
             else if (next && i === st.i + 1 && !(cur.reveal && cur.reveal.step === s && cur.reveal.stage === 1)) {
               var oLive = !!(cur.reveal && cur.reveal.step === s && cur.reveal.stage === 2);
-              html += workCell(i < div.DS.length ? div.DS[i] : "0", oLive ? "down down-live" : "down", oLive ? ' data-orosu-dst="1"' : "");
+              if (oLive && !cur.orosuDone) {
+                // おろすタップ待ち：行き先は空けておき、矢印の的だけ置く
+                html += workCell("", "down down-live dst-wait", ' data-orosu-dst="1"');
+              } else {
+                html += workCell(i < div.DS.length ? div.DS[i] : "0", oLive ? "down down-live drop-in" : "down", oLive ? ' data-orosu-dst="1"' : "");
+              }
             }
             else html += workCell("");
           }
@@ -1066,6 +1102,7 @@
         $("stage-area").innerHTML = html;
         updateDivNote();
         positionOrosuArrow();
+        if (orosuWait) attachOrosuHandlers();
       }
       // おろす段階表示のとき、出どころの数字から下ろした数字へ矢印を重ねる（表示だけの演出）
       function positionOrosuArrow() {
@@ -1090,6 +1127,45 @@
           '<polygon points="' + (x - 5) + "," + (y2 - 7) + " " + (x + 5) + "," + (y2 - 7) + " " + x + "," + y2 + '" fill="#7a5faa" opacity="0.85"/>';
         grid.appendChild(svg);
       }
+      // おろす段階では、わられる数の数字セルをタップ対象にする
+      function attachOrosuHandlers() {
+        document.querySelectorAll("[data-orosu-pos]").forEach(function (el) {
+          el.addEventListener("click", function () { onOrosuTap(Number(el.getAttribute("data-orosu-pos"))); });
+        });
+      }
+      function onOrosuTap(pos) {
+        if (!cur || cur.phase !== "hissan" || !cur.reveal || cur.reveal.stage !== 2 || cur.orosuDone) return;
+        var div = cur.div;
+        var rst = div.steps[cur.reveal.step];
+        if (!rst) return;
+        var srcPos = rst.i + 1;
+        if (pos === srcPos) {
+          cur.orosuDone = true;
+          playSound("click");
+          var id = cur.reveal.id;
+          drawDiv();
+          setTimeout(function () {
+            if (!revealAlive(id)) return;
+            cur.reveal = null;
+            cur.orosuDone = false;
+            drawDiv();
+          }, 620);
+        } else {
+          cur.stageFlags.hissan = true;
+          cur.orosuWrongs = (cur.orosuWrongs || 0) + 1;
+          playSound("wrong");
+          var grid = document.querySelector(".h-grid");
+          if (grid) { grid.classList.remove("anim-shake"); void grid.offsetWidth; grid.classList.add("anim-shake"); }
+          var digit = srcPos < div.DS.length ? div.DS[srcPos] : "0";
+          var body;
+          if (cur.orosuWrongs >= 2) {
+            body = "おろすのは「" + digit + "」だよ。紫の わくが ついて 光っている 数字を タップしよう。";
+          } else {
+            body = "ちがう 数字だよ。おろすのは、いま 立てた 商の すぐ右の 数字。紫の わくが ついた 数字を タップしよう。";
+          }
+          setFeedback("bad", "おしい！", body, "retry");
+        }
+      }
       var PILL_LABELS = ["① たてる", "② かける", "③ ひく", "④ おろす"];
       var PILL_KEYS = ["tateru", "kakeru", "hiku", "orosu"];
       function pillsHTML() {
@@ -1105,36 +1181,86 @@
       function revealAlive(id) {
         return !!(cur && cur.phase === "hissan" && cur.reveal && cur.reveal.id === id && !$("view-quiz").classList.contains("hidden"));
       }
-      // 商が正解したら、かける→ひく→おろす を順に見せる（表示だけの演出。判定は変えない）
-      function startReveal(isLast) {
+      // 商が正解したら、かける（積の入力）→ひく（差の入力）→おろす（タップ）を、子どもが自分で進める
+      function beginSubSteps() {
         var id = ++revealSeq;
         cur.reveal = { step: cur.stepIdx, stage: 0, id: id };
         cur.stepIdx++;
+        initSubEntry();
         drawDiv();
-        var D1 = 500, D2 = 500, D3 = 560;
-        setTimeout(function () {
-          if (!revealAlive(id)) return;
+      }
+      function subTargetStr() {
+        var st = cur.div.steps[cur.reveal.step];
+        return cur.reveal.stage === 0 ? String(st.prod) : String(st.rAfter);
+      }
+      function initSubEntry() {
+        var st = cur.div.steps[cur.reveal.step];
+        var str = subTargetStr();
+        cur.subFilled = {};
+        cur.subPos = st.i - (str.length - 1);
+        cur.subErr = 0;
+        cur.subLock = false;
+      }
+      function advanceSub() {
+        if (!cur.reveal) return;
+        var isLast = cur.reveal.step >= cur.div.steps.length - 1;
+        if (cur.reveal.stage === 0) {
           cur.reveal.stage = 1;
+          initSubEntry();
           drawDiv();
-        }, D1);
-        if (isLast) {
-          setTimeout(function () {
-            if (!revealAlive(id)) return;
+        } else if (cur.reveal.stage === 1) {
+          if (isLast) {
             cur.reveal = null;
             drawDiv();
             finishHissan();
-          }, D1 + D2);
-        } else {
-          setTimeout(function () {
-            if (!revealAlive(id)) return;
+          } else {
+            // おろすは、子どものタップで進む（自動では進まない）
             cur.reveal.stage = 2;
+            cur.orosuDone = false;
+            cur.orosuWrongs = 0;
             drawDiv();
-          }, D1 + D2);
+          }
+        }
+      }
+      function onSubDigit(d) {
+        var st = cur.div.steps[cur.reveal.step];
+        var isProd = cur.reveal.stage === 0;
+        var str = subTargetStr();
+        var start = st.i - (str.length - 1);
+        var expected = Number(str[cur.subPos - start]);
+        if (d === expected) {
+          cur.subFilled[cur.subPos] = d;
+          cur.subPos++;
+          playSound("click");
+          if (cur.subPos > st.i) advanceSub();
+          else drawDiv();
+          return;
+        }
+        // 間違いは「筆算」分類で記録する。助けは段階式：1回目=フィードバック、2回目=式のヒント、3回目=自動表示して進める
+        cur.stageFlags.hissan = true;
+        cur.subErr++;
+        playSound("wrong");
+        var grid = document.querySelector(".h-grid");
+        if (grid) { grid.classList.remove("anim-shake"); void grid.offsetWidth; grid.classList.add("anim-shake"); }
+        if (cur.subErr >= 3) {
+          for (var j = start; j <= st.i; j++) cur.subFilled[j] = Number(str[j - start]);
+          cur.subLock = true;
+          drawDiv();
+          setFeedback("", "", (isProd ? "かける 答えは " : "ひいた 答えは ") + str + " だよ。そのまま 次へ 進むよ。", "hint");
+          var id = cur.reveal.id;
           setTimeout(function () {
             if (!revealAlive(id)) return;
-            cur.reveal = null;
-            drawDiv();
-          }, D1 + D2 + D3);
+            cur.subLock = false;
+            advanceSub();
+          }, 1000);
+        } else if (cur.subErr === 2) {
+          setFeedback("bad", "おしい！", isProd
+            ? "ヒント：" + cur.p.db + " × " + st.q + " を 計算して みよう。"
+            : "ヒント：" + st.working + " − " + st.prod + " を 計算して みよう。", "retry");
+        } else {
+          setFeedback("bad", "おしい！", isProd
+            ? "かけ算を たしかめて、もう一度 入れてみよう。"
+            : "ひき算を たしかめて、もう一度 入れてみよう。", "retry");
         }
       }
       function updateDivNote() {
@@ -1146,14 +1272,19 @@
           var rst = div.steps[cur.reveal.step];
           if (!rst) return;
           if (cur.reveal.stage === 0) {
-            note.textContent = cur.p.db + " × " + rst.q + " ＝ " + rst.prod + " ： かける ところを 見よう";
-            setAnswerBox("かける：" + cur.p.db + " × " + rst.q, false);
+            note.textContent = "かけた 答え（積）を 入れよう。光っている マスが 入れる ところだよ";
+            setAnswerBox("かける：積を 入れよう", false);
           } else if (cur.reveal.stage === 1) {
-            note.textContent = rst.working + " − " + rst.prod + " ＝ " + rst.rAfter + " ： ひいた 結果を 見よう";
-            setAnswerBox("ひく：" + rst.working + " − " + rst.prod, false);
+            note.textContent = "ひいた 答えを 入れよう。光っている マスが 入れる ところだよ";
+            setAnswerBox("ひく：答えを 入れよう", false);
           } else {
-            note.textContent = "あまりに 次の 数字を おろして こよう";
-            setAnswerBox("おろす：次の 数字", false);
+            if (cur.orosuDone) {
+              note.textContent = "その 数字を おろしたよ。つぎの 商を 立てよう";
+              setAnswerBox("おろした！", false);
+            } else {
+              note.textContent = "あまりに 次の 数字を おろして こよう。おろす 数字を タップしてね";
+              setAnswerBox("おろす：数字を タップ", false);
+            }
           }
           return;
         }
@@ -1165,7 +1296,12 @@
       function onKeyDigit(d) {
         if (!cur) return;
         if (cur.phase !== "hissan") return;
-        if (cur.reveal) return;
+        if (cur.subLock) return;
+        if (cur.reveal) {
+          if (cur.reveal.stage === 2) return; // おろすはタップで進める
+          onSubDigit(d);
+          return;
+        }
         var step = cur.div.steps[cur.stepIdx];
         if (!step) return;
         var p = cur.p;
@@ -1174,7 +1310,7 @@
           cur.consecErr = 0;
           var isLast = cur.stepIdx >= cur.div.steps.length - 1;
           playSound(isLast ? "correct" : "click");
-          startReveal(isLast);
+          beginSubSteps();
         } else {
           cur.stageFlags.hissan = true;
           cur.consecErr++;
